@@ -20,12 +20,12 @@
 # deploy haproxy load balancer and consul integration
 - hosts: load_balancer
   roles:
-    -role: haproxy_server
+    -role: haproxy
 
 # deploy centralized log file collection
 - hosts: logstash_server
   roles:
-    -role: logstash_server
+    -role: logstash
 
 # deploy apache and admin front ends
 - hosts: web_servers
