@@ -1,0 +1,15 @@
+{
+    {% if not consul_join %}
+    "bootstrap_expect": 3,
+    {% endif %}
+    {% if consul_join %}
+    "start_join": ["{{ consul_join }}"],
+    {% endif %}
+    "server": true,
+    "rejoin_after_leave": true,
+    "enable_syslog": true,
+    "data_dir": "{{ consul_data_dir }}",
+    "ui_dir": "{{ consul_ui_dir }}",
+    "datacenter": "{{ ansible_ec2_placement_region }}",
+    "recursor": "10.0.0.2"
+}

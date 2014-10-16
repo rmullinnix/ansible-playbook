@@ -1,0 +1,4 @@
+---
+aeb_data_dir: /usr/nano/data
+aeb_log_dir: /usr/nano/log
+logstash_server_port: 10.80.7.129:5075

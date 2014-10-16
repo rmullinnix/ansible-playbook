@@ -1,0 +1,23 @@
+---
+# Deploy consul to all servers in cluster
+#   run as server or agent
+
+# Establish directory structure and deploy code
+- hosts: consul_all
+  takss:
+    - include: tasks/install_consul.yml
+
+# Setup server configuration
+- hosts: consul_servers
+  roles:
+    -role: consulserver
+
+# Setup agent configuration
+- hosts: consul_agents
+  roles:
+    -role: consul_agent
+
+  handlers:
+    - include: handlers/restart_consul.yml
+~
+~

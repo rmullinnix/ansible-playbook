@@ -1,0 +1,20 @@
+---
+- hosts: application
+  vars:
+  sudo: yes
+
+  tasks:
+  - name: Create bin dir
+    file: path=/usr/nano/go/bin mode=755 state=directory
+
+  - name: Install Logstash Forwarder
+    copy: src=/usr/nano/build/go/bin/logstash-forwarder mode=744 dest=/usr/nano/bin/logstash-forwarder
+
+  - name: Install Logstash Shell Script
+    copy: src=/usr/nano/build/go/bin/logstash-forwarder.sh mode=744 dest=/usr/nano/bin/logstash-forwarder.sh
+
+  - name: Install Certificate
+    copy: src=files/ssl/certs/logstash-forwarder.crt mode=400 dest=/etc/ssl/certs/logstash-forwarder.crt
+
+  - name: Install Configuration File
+    template: src=templates/logstash-forwarder.conf mode=644 dest=/etc/logstash-forwarder.conf

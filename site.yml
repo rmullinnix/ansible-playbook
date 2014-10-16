@@ -1,0 +1,38 @@
+---
+# This Playbook deploys the code and infrastructure to run a Web based application
+#   js front-end and rest based services backend
+
+# setup commond directory structure and users/groups
+- hosts: all
+  roles:
+    - role: common
+
+# setup and deploy consul servers and consul agents
+- hosts: consul_servers
+  tasks:
+    -include: consul.yml
+
+# deploy mongo replication cluster
+- hosts: dbservers
+  roles:
+    -role: mongod
+
+# deploy haproxy load balancer and consul integration
+- hosts: load_balancer
+  roles:
+    -role: haproxy_server
+
+# deploy centralized log file collection
+- hosts: logstash_server
+  roles:
+    -role: logstash_server
+
+# deploy apache and admin front ends
+- hosts: web_servers
+  tasks:
+    -include: web_servers.yml
+
+# deploy application components
+- hosts: application
+  tasks:
+    -include: application.yml

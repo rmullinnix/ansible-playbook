@@ -1,0 +1,29 @@
+---
+- hosts: application
+  vars:
+  sudo: yes
+
+  tasks:
+  - name: Create bin dir
+    file: path=/usr/nano/go/bin mode=755 state=directory
+
+  - name: Install Account
+    copy: src=/usr/nano/build/go/bin/account mode=744 dest=/usr/nano/bin/account
+
+  - name: Install Registration
+    copy: src=/usr/nano/build/go/bin/authorization mode=744 dest=/usr/nano/bin/registration
+
+  - name: Install Announcement
+    copy: src=/usr/nano/build/go/bin/announcement mode=744 dest=/usr/nano/bin/announcement
+
+  - name: Install Notification
+    copy: src=/usr/nano/build/go/bin/notification mode=744 dest=/usr/nano/bin/notification
+
+  - name: Install Reference
+    copy: src=/usr/nano/build/go/bin/reference mode=744 dest=/usr/nano/bin/reference
+
+  - name: Create log directory
+    file: path={{ aeb_log_dir }} state=directory
+
+  - name: Create data dir
+    file: path={{ aeb_data_dir }} mode=755 state=directory
