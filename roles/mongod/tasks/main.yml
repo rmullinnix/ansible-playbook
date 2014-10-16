@@ -1,0 +1,32 @@
+---
+# installs mongodb on servers
+#   need to add script to start and configure replication
+#   need to add script to create host user and group
+#   need to add script to create db users
+
+  - name: Create Mongo bin dir
+    file: path=/usr/nano/bin state=directory
+
+  - name: Create Mongo data dir
+    file: path={{ mongo_data_dir }} mode=755 state=directory
+
+  - name: Create Mongo log dir
+    file: path={{ mongo_log_dir }} mode=755 state=directory
+
+# copy and unpack mongo executable archive
+  - name: Install Mongo executables
+    unarchive: src=/usr/nano/build/archive/mongo-2.6.3.tar.gz dest=/usr/nano/bin
+
+  - name: Create mongodb config
+    template: src=../templates/mongodb.conf dest=/etc/mongodb.conf
+
+  - name: Install mongo init script
+    copy: src=../files/init.d/mongodb mode=744 dest=/etc/init.d/mongodb
+
+# SUSE install service
+  - name: Run chkconfig to enable service
+    command: /sbin/insserv mongodb
+
+# start the mongod service
+  - name: Enable mongod service
+    command: /etc/init.d/mongodb start

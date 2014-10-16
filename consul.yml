@@ -10,7 +10,7 @@
 # Setup server configuration
 - hosts: consul_servers
   roles:
-    -role: consulserver
+    -role: consul_server
 
 # Setup agent configuration
 - hosts: consul_agents
