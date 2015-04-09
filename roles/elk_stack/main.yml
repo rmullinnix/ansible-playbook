@@ -1,0 +1,86 @@
+---
+- hosts: elk_servers
+  sudo: yes
+
+  tasks:
+  - name: Ensure group is present
+    group: name=nanotech state=present
+
+  - name: Create user to be used by dameon processes
+    user: name=nanolog comment="Nanotech Logging Services" group=nanotech
+
+  - name:  Check for java jdk
+    command: rpm -q jdk
+    register: rpm_check
+    failed_when: rpm_check.rc > 1
+
+  - name: Copy java jdk
+    copy: src=/usr/nano/build/jdk/jdk-7u67-linux-x64.rpm dest=/tmp/jdk-7u67-linux-x64.rpm
+    when: rpm_check.rc == 1
+
+  - name: Install java jdk
+    command: rpm -i /tmp/jdk-7u67-linux-x64.rpm
+    when: rpm_check.rc == 1
+
+  - name: Ensure proper directory permissions
+    file: path=/usr/nano state=directory group=nanotech
+
+  - name: Create log directories
+    file: path=/usr/nano/log state=directory group=nanotech
+
+  - name: Check for current version
+    command: /usr/nano/elasticsearch/current/bin/elasticsearch -v
+    register: vers_check
+    failed_when: vers_check.rc > 2
+
+  - name: Copy and extract elk_stack
+    unarchive: src=/usr/nano/build/elk_stack.tar.gz dest=/usr/nano owner=nanolog group=nanotech
+    when: vers_check.rc > 0
+
+  - name: Create Elastic Search Data directory
+    file: path=/usr/nano/elasticsearch/current/data state=directory group=nanotech owner=nanolog
+
+  - name: Create Logstash config directory
+    file: path=/etc/logstash/conf.d state=directory group=nanotech owner=nanolog
+
+  - name: Copy logstash input config files
+    copy: src=files/01-lumberjack-input.conf dest=/etc/logstash/conf.d/01-lumberjack-input.conf owner=nanolog group=nanotech
+
+  - name: Copy logstash output config files
+    copy: src=files/30-lumberjack-output.conf dest=/etc/logstash/conf.d/30-lumberjack-output.conf owner=nanolog group=nanotech
+
+  - name: Install init.d scripts - elasticsearch
+    copy: src=files/elasticsearch.init.d dest=/etc/init.d/elasticsearch mode=744
+
+  - name: Install elasticseach as service
+    command: /sbin/insserv -f elasticsearch
+
+  - name: Install init.d scripts - logstash
+    copy: src=files/logstash.init.d dest=/etc/init.d/logstash mode=744
+
+  - name: Install logstash as service
+    command: /sbin/insserv -f logstash
+
+  - name: Install init.d scripts - kibana
+    copy: src=files/kibana.init.d dest=/etc/init.d/kibana mode=744
+
+  - name: Install kibana as service
+    command: /sbin/insserv -f kibana
+
+  - name: Copy ssl template
+    template: src=templates/logstash.cnf dest=/etc/ssl/logstash.cnf
+
+  - name: Generate logstash-forwarder cert and key
+    command: openssl req -config /etc/ssl/logstash.cnf -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout /etc/ssl/private/logstash-forwarder.key -out /etc/ssl/certs/logstash-forwarder.crt
+
+  - name: Retrieve logstash-forwarder cert
+    fetch: src=/etc/ssl/certs/logstash-forwarder.crt dest=files/logstash-forwarder.crt
+
+  - name: Start elasticsearch service
+    service: name=elasticsearch state=restarted
+
+  - name: Start logstash service
+    service: name=logstash state=restarted
+
+  - name: Start kibana service
+    service: name=kibana state=restarted

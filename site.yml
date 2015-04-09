@@ -23,9 +23,9 @@
     -role: haproxy
 
 # deploy centralized log file collection
-- hosts: logstash_server
+- hosts: elk_server
   roles:
-    -role: logstash
+    -role: elk_stack
 
 # deploy apache and admin front ends
 - hosts: web_servers
