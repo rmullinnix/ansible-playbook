@@ -1,0 +1,38 @@
+---
+  - name: Create consul group
+    group: name="{{ consul_group }}"
+
+  - name: Create consul user
+    user: name="{{ consul_user }}" comment="Consul dameon account" group="{{ consul_group }}"
+
+  - name: Create Consul Agent config
+    template: src=consulagent.conf dest=/etc/consul.conf owner="{{ consul_user }}" group="{{ consul_group }}" mode=744
+    when: "'consulagents' in group_names"
+
+  - name: Create Consul Server config
+    template: src=consulserver.conf dest=/etc/consul.conf owner="{{ consul_user }}" group="{{ consul_group }}" mode=744
+    when: "'consulservers' in group_names"
+
+  - name: Create Consul bin dir
+    file: path={{ consul_app_path }}/bin state=directory owner="{{ consul_user }}" group="{{ consul_group }}" mode=744
+
+  - name: Install Consul
+    copy: src=/usr/nano/build/dev/consul/bin/consul dest={{ consul_app_path }}/bin/consul owner="{{ consul_user }}" group="{{ consul_group }}" mode=744
+
+  - name: Create Consul config folder
+    file: path={{ consul_config_dir }} state=directory owner="{{ consul_user }}" group="{{ consul_group }}" mode=744
+
+  - name: Create Consul data dir
+    file: path={{ consul_data_dir }} mode=755 state=directory owner="{{ consul_user }}" group="{{ consul_group }}"
+
+  - name: Create Consul log dir
+    file: path={{ consul_log_dir }} mode=755 state=directory owner="{{ consul_user }}" group="{{ consul_group }}"
+
+  - name: Install consul init.d script
+    template: src=consul.init.d mode=744 dest=/etc/init.d/consul
+
+  - name: Run insserv to install service
+    command: /sbin/insserv -f consul
+
+  - name: Start consul service
+    service: name=consul state=restarted

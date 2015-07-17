@@ -1,0 +1,32 @@
+---
+  - name: Create Consul Agent config
+    template: src=consulagent.conf dest=/etc/consul.conf
+    when: "'consulagents' in group_names"
+
+  - name: Create Consul Server config
+    template: src=consulserver.conf dest=/etc/consul.conf
+    when: "'consulservers' in group_names"
+
+  - name: Create Consul bin dir
+    file: path={{ consul_app_path }}/bin state=directory
+
+  - name: Install Consul
+    copy: src=/usr/nano/build/consul/bin/consul mode=744 dest={{ consul_app_path }}/bin/consul
+
+  - name: Create Consul config folder
+    file: path={{ consul_config_dir }} state=directory
+
+  - name: Create Consul data dir
+    file: path={{ consul_data_dir }} mode=755 state=directory
+
+  - name: Create Consul log dir
+    file: path={{ consul_log_dir }} mode=755 state=directory
+
+  - name: Install consul init.d script
+    template: src=consul.init.d mode=744 dest=/etc/init.d/consul
+
+#  - name: Run insserv to install service
+#    command: /sbin/insserv -f consul
+
+#  - name: Enable consul service
+#    command: /etc/init.d/consul start

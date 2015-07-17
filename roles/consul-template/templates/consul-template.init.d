@@ -1,39 +1,35 @@
 #!/bin/bash
 #
-# consul        Manage the consul agent
+# consul        Manage the consul-template agent
 #       
 # chkconfig:   2345 95 95
-# description: Consul is a tool for service discovery and configuration
-# processname: consul
-# config: /etc/sysconfig/consul.d
+# description: Consul-template is a tool sync the consul registry with a template file
+# processname: consul-template
+# config: /etc/consul-template.conf
 # pidfile: /var/run/consul.pid
  
 ### BEGIN INIT INFO
-# Provides:       consul
+# Provides:       consul-template
 # Required-Start: $local_fs $network
 # Required-Stop:
 # Should-Start:
 # Should-Stop:
 # Default-Start: 2 3 4 5
 # Default-Stop:  0 1 6
-# Short-Description: Manage the consul agent
-# Description: Consul is a tool for service discovery and configuration
+# Short-Description: Manage the consul-template agent
+# Description: Consul-template is a tool sync the consul registry with a template file
 ### END INIT INFO
 . /etc/rc.status
 rc_reset
  
-prog="consul"
+prog="consul-template"
 user="root"
-exec="/usr/nano/bin/$prog"
+exec="{{ consul_template_app_path }}/bin/$prog"
 pidfile="/var/run/$prog.pid"
 lockfile="/var/lock/subsys/$prog"
-logfile="/usr/nano/log/$prog"
-conffile="/etc/consulagent.conf"
-confdir="/etc/consul.d"
-uidir="/var/httpd/prod/ui"
- 
-# pull in sysconfig settings
-[ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
+logfile="{{ consul_template_log_dir }}/$prog.log"
+conffile="{{ consul_template_config_file }}"
+confdir="{{ consul_template_config_dir }}"
  
 export GOMAXPROCS=${GOMAXPROCS:-2}
  
@@ -59,7 +55,7 @@ start() {
     /sbin/start_daemon -f \
         -p $pidfile \
         -u $user \
-		$exec agent -config-file=$conffile $bootstrap -config-dir=$confdir 2>&1 >> $logfile & echo $! > $pidfile
+		$exec -config $conffile 2>&1 >> $logfile & echo $! > $pidfile
     
     RETVAL=$?
     echo

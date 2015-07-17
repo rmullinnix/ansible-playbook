@@ -1,7 +1,11 @@
 ---
-consul_join: 10.80.7.129
+consul_join: {% for host in groups['consul_servers'] %} {{ host }} {% if not loop.last %} , {% endif %} {% endfor %}
+consul_server: {% if {{ ansible_hostname }} in groups['consul_servers'] %} true {% else %} false {% endif %}
+consul_app_path: /usr/local/consul
 consul_config_dir: /etc/consul.d
+consul_config_file: /etc/consul.conf
 consul_data_dir: /usr/nano/data/consul
 consul_log_dir: /usr/nano/log
 consul_log_lvl: WARN 
 consul_ui_dir: /var/httpd/prod/ui
+consul_data_center: {{ ansible_environment }}

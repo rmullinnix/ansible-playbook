@@ -1,0 +1,30 @@
+---
+  - name: Create apache webserver group
+    group: name="{{ apache_group }}"
+
+  - name: Create apache user
+    user: name="{{ apache_user }}" comment="Apache dameon account" group="{{ apache_group }}"
+
+  - name: Create apache application directory
+    file: path="{{ inf_app_path }}/apache2" state=directory owner="{{ apache_user }}" group="{{ apache_group }}" mode=744
+
+  - name: Copy and extract apache2
+    unarchive: src=/usr/nano/build/dev/apache2/apache2.tar.gz dest="{{ inf_app_path}}/apache2" owner="{{ apache_user }}" group="{{ apache_group }}"
+
+  - name: Create apache httpd.conf
+    template: src=httpd.conf dest="{{ inf_app_path }}/apache2/conf/httpd.conf" owner="{{ apache_user }}" group="{{ apache_group }}"
+
+  - name: Create apache envvars
+    template: src=envvars dest="{{ inf_app_path }}/apache2/bin/envvars" owner="{{ apache_user }}" group="{{ apache_group }}"
+
+  - name: Create apache directory root
+    file: path={{ apache_doc_root }} state=directory owner="{{ apache_user }}" group="{{ apache_group }}" mode=744
+
+  - name: Create apache init.d script
+    template: src=init.d.apache2 dest=/etc/init.d/apache2 mode=744
+
+  - name: Run insserv to install apache service
+    command: /sbin/insserv -f apache2
+
+  - name: Start apache service
+    service: name=apache2 state=restarted

@@ -1,0 +1,20 @@
+---
+  - include_vars: ../../apache/vars/main.yml
+      
+  - name: Create consul ui directory in apache doc root
+    file: path="{{ apache_doc_root }}/consului" state=directory owner="{{ apache_user }}" group="{{ apache_group }}" mode=744
+
+  - name: Copy consul ui
+    copy: src=/usr/nano/build/dev/consului/ dest="{{ apache_doc_root}}/consului/" owner="{{ apache_user }}" group="{{ apache_group }}" mode=744
+
+  - name: Add ui-dir command line argument to start in init.d script
+    lineinfile: dest=/etc/consul.conf regexp="%agent -config-file=" line="     $exec agent -config-file=$conffile -config-dir=$confdir -ui-dir=/var/httpd/dev/consului 2>&1 >> $logfile & echo $! > $pidfile"
+
+  - name: Add apache mod_proxy to connect to consul
+    lineinfile: dest="{{ inf_app_path }}/apache2/conf/httpd.conf" regexp="^ProxyPass /v1" insertafter="^#ProxyPass" line="ProxyPass /v1/ http://localhost:8500/v1/"
+
+  - name: Restart apache service
+    service: name=apache2 state=restarted
+
+  - name: Restart consul service
+    service: name=consul state=restarted

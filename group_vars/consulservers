@@ -1,5 +1,4 @@
 ---
-consul_join: 10.80.7.129
 consul_config_dir: /etc/consul.d
 consul_data_dir: /usr/nano/data/consul
 consul_log_dir: /usr/nano/log

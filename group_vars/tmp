@@ -1,0 +1,10 @@
+---
+consul_join: 10.17.17.17
+consul_server: false
+consul_app_path: /usr/local/consul
+consul_config_dir: /etc/consul.d
+consul_config_file: /etc/consul.conf
+consul_data_dir: /usr/nano/data/consul
+consul_log_dir: /usr/nano/log
+consul_log_lvl: WARN 
+consul_data_center: {{ ansible_environment }}
