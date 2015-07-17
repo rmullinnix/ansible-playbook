@@ -1,32 +1,21 @@
 ---
-  - name: Create Consul Agent config
-    template: src=consulagent.conf dest=/etc/consul.conf
-    when: "'consulagents' in group_names"
-
-  - name: Create Consul Server config
-    template: src=consulserver.conf dest=/etc/consul.conf
-    when: "'consulservers' in group_names"
+  - name: Create consul-template config
+    template: src=consulagent.conf dest="{{ consul_template_config_file }}"
 
   - name: Create Consul bin dir
-    file: path={{ consul_app_path }}/bin state=directory
+    file: path={{ inf_app_path }}/consul-template/bin state=directory
 
-  - name: Install Consul
-    copy: src=/usr/nano/build/consul/bin/consul mode=744 dest={{ consul_app_path }}/bin/consul
+  - name: Install consul-template
+    copy: src="/usr/nano/build/{{ ansible_environment}}/consul-template/bin/consul-template" mode=744 dest="{{ inf_app_path }}consul-template/bin/consul-template"
 
-  - name: Create Consul config folder
+  - name: Create consul-template config folder
     file: path={{ consul_config_dir }} state=directory
 
-  - name: Create Consul data dir
-    file: path={{ consul_data_dir }} mode=755 state=directory
+  - name: Install consul-tempplate init.d script
+    template: src=consul-template.init.d mode=744 dest=/etc/init.d/consul-template
 
-  - name: Create Consul log dir
-    file: path={{ consul_log_dir }} mode=755 state=directory
+  - name: Run insserv to install service
+    command: /sbin/insserv -f consul-template
 
-  - name: Install consul init.d script
-    template: src=consul.init.d mode=744 dest=/etc/init.d/consul
-
-#  - name: Run insserv to install service
-#    command: /sbin/insserv -f consul
-
-#  - name: Enable consul service
-#    command: /etc/init.d/consul start
+  - name: Start consul-template service
+    command: /etc/init.d/consul-template start

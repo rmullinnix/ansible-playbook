@@ -24,10 +24,10 @@ rc_reset
  
 prog="consul-template"
 user="root"
-exec="{{ consul_template_app_path }}/bin/$prog"
+exec="{{ inf_app_path }}/$prog/bin/$prog"
 pidfile="/var/run/$prog.pid"
 lockfile="/var/lock/subsys/$prog"
-logfile="{{ consul_template_log_dir }}/$prog.log"
+logfile="{{ inf_log_path }}/$prog.log"
 conffile="{{ consul_template_config_file }}"
 confdir="{{ consul_template_config_dir }}"
  

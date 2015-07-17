@@ -1,0 +1,57 @@
+---
+  - name: Ensure group is present
+    group: name="{{ inf_group }}" state=present
+
+  - name: Create user to be used by dameon processes
+    user: name="{{ elasticsearch_user }}" comment="Nanotech Logging Services" group="{{ inf_group }}"
+
+  - name:  Check for java jdk
+    command: rpm -q jdk
+    register: rpm_check
+    failed_when: rpm_check.rc > 1
+
+  - name: Copy java jdk
+    copy: src="/usr/nano/build/{{ ansible_environment }}/jdk/{{ jdk_rpm }}jdk-7u67-linux-x64.rpm" dest="/tmp/{{ jdk_rpm }}"
+    when: rpm_check.rc == 1
+
+  - name: Install java jdk
+    command: rpm -i "/tmp/{{ jdk_rpm }}"
+    when: rpm_check.rc == 1
+
+  - name: Ensure proper directory permissions
+    file: path="{{ inf_app_path }}" state=directory group="{{ inf_group }}"
+
+  - name: Create log directory
+    file: path="{{ inf_log_path }}/elasticsearch" state=directory group="{{ inf_group }}"
+
+  - name: Check for current version
+    command: "{{ inf_app_path }}/elasticsearch/current/bin/elasticsearch -v"
+    register: vers_check
+    failed_when: vers_check.rc > 2
+
+  - name: Copy and extract elasticsearch
+    unarchive: src="/usr/nano/build/{{ ansible_environment }}/elasticsearch/elasticsearch.tar.gz" dest="{{ inf_app_path }}/elasticsearch" owner="{{ elasticsearch_owner }}" group="{{ inf_group }}"
+    when: vers_check.rc > 0
+
+  - name: Create Elastic Search Data directory
+    file: path="{{ inf_data_path }}/elasticsearch" state=directory group="{{ inf_group }}" owner="{{ elasticsearch_owner }}"
+
+  - name: Add consul key for elasticseach conf file
+    consul_kv:
+      key: software/elasticsearch/conf/port
+      value: "{{ elasticsearch_port }}"
+
+  - name: Add consul-template config file
+    template: src=consul-template.conf dest=/etc/consul-template/conf.d/elasticsearch
+
+  - name: Install elasticsearch init.d script
+    template: src=elasticsearch.init.d dest=/etc/init.d/elasticsearch mode=744
+
+  - name: Install elasticsearch as service
+    command: /sbin/insserv -f elasticsearch
+
+  - name: Restart consul-template service (should start elasticsearch)
+    service: name=consul-template state=restarted
+
+#  - name: Start elasticsearch service
+#    service: name=elasticsearch state=restarted

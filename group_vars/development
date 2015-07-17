@@ -1,9 +1,12 @@
 ---
-ansible_environment: aebdev
+ansible_environment: dev
 inf_app_path: /usr/local
 inf_data_path: /usr/nano/data
 inf_log_path: /usr/nano/log
+inf_group: nanocore
 apache_port: 8040
 apache_admin: Rob.Mullinnix@assurant.com
 apache_doc_root: /var/httpd/dev
 apache_log_level: warn
+consul_port: 8500
+jdk_rpm: jdk-7u67-linux-x64.rpm

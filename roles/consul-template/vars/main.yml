@@ -1,5 +1,3 @@
 ---
-consul_port: 8500
-consul_template_app_path: /usr/local/consul-template
 consul_template_config_dir: /etc/consul-template/conf.d
-consul_template_log_dir: /usr/nano/log
+consul_template_config_file: /etc/consul-template.conf
