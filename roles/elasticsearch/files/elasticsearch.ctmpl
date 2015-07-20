@@ -221,7 +221,7 @@
 
 # Set a custom port to listen for HTTP traffic:
 #
-http.port: {{key "software/elasticSearch/config/port"}}
+http.port: {{key "software/elasticsearch/conf/port"}}
 
 # Set a custom allowed content length:
 #

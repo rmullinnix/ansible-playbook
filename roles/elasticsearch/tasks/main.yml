@@ -36,13 +36,23 @@
   - name: Create Elastic Search Data directory
     file: path="{{ inf_data_path }}/elasticsearch" state=directory group="{{ inf_group }}" owner="{{ elasticsearch_user }}"
 
-  - name: Add consul key for elasticseach conf file
-    consul_kv: 
-      key: software/elasticsearch/conf/port
-      value: "{{ elasticsearch_port }}"
+  - name: Add bootstrap program
+    copy: src="/usr/nano/build/{{ ansible_environment }}/bootstrap/bootstrap" dest=/tmp/bootstrap mode=777
+
+  - name: Add bootstrap conf file
+    copy: src=bs_elasticsearch.conf dest=/tmp/bs_elasticsearch.conf
+
+  - name: Add bootstrap tmpl file
+    template: src=bs_elasticsearch.tmpl dest=/tmp/bs_elasticsearch.tmpl
+
+  - name: Run bootstrap process
+    command: /tmp/bootstrap -conf=/tmp/bs_elasticsearch.conf -tmpl=/tmp/bs_elasticsearch.tmpl
 
   - name: Add consul-template config file
     template: src=consul-template.conf dest=/etc/consul-template/conf.d/elasticsearch
+
+  - name: Add consul-template ctmpl file
+    copy: src=elasticsearch.ctmpl dest=/etc/consul-template/ctmpl/elasticsearch.ctmpl
 
   - name: Install elasticsearch init.d script
     template: src=elasticsearch.init.d dest=/etc/init.d/elasticsearch mode=744
