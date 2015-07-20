@@ -24,11 +24,10 @@ rc_reset
  
 prog="consul-template"
 user="root"
-exec="{{ inf_app_path }}/$prog/bin/$prog"
+exec="{{ inf_app_path }}/$prog/$prog"
 pidfile="/var/run/$prog.pid"
 lockfile="/var/lock/subsys/$prog"
 logfile="{{ inf_log_path }}/$prog.log"
-conffile="{{ consul_template_config_file }}"
 confdir="{{ consul_template_config_dir }}"
  
 export GOMAXPROCS=${GOMAXPROCS:-2}
@@ -55,7 +54,7 @@ start() {
     /sbin/start_daemon -f \
         -p $pidfile \
         -u $user \
-		$exec -config $conffile 2>&1 >> $logfile & echo $! > $pidfile
+		$exec -config $confdir 2>&1 >> $logfile & echo $! > $pidfile
     
     RETVAL=$?
     echo
@@ -92,7 +91,7 @@ force_reload() {
  
 rh_status() {
     checkproc -p $pidfile $exec
-    $exec version
+    $exec --version
     rc_status -v
 }
  

@@ -11,7 +11,7 @@
     failed_when: rpm_check.rc > 1
 
   - name: Copy java jdk
-    copy: src="/usr/nano/build/{{ ansible_environment }}/jdk/{{ jdk_rpm }}jdk-7u67-linux-x64.rpm" dest="/tmp/{{ jdk_rpm }}"
+    copy: src="/usr/nano/build/{{ ansible_environment }}/jdk/{{ jdk_rpm }}" dest="/tmp/{{ jdk_rpm }}"
     when: rpm_check.rc == 1
 
   - name: Install java jdk
@@ -19,7 +19,7 @@
     when: rpm_check.rc == 1
 
   - name: Ensure proper directory permissions
-    file: path="{{ inf_app_path }}" state=directory group="{{ inf_group }}"
+    file: path="{{ inf_app_path }}/elasticsearch" state=directory group="{{ inf_group }}"
 
   - name: Create log directory
     file: path="{{ inf_log_path }}/elasticsearch" state=directory group="{{ inf_group }}"
@@ -30,14 +30,14 @@
     failed_when: vers_check.rc > 2
 
   - name: Copy and extract elasticsearch
-    unarchive: src="/usr/nano/build/{{ ansible_environment }}/elasticsearch/elasticsearch.tar.gz" dest="{{ inf_app_path }}/elasticsearch" owner="{{ elasticsearch_owner }}" group="{{ inf_group }}"
+    unarchive: src="/usr/nano/build/{{ ansible_environment }}/elasticsearch/elasticsearch.tar.gz" dest="{{ inf_app_path }}/elasticsearch" owner="{{ elasticsearch_user }}" group="{{ inf_group }}"
     when: vers_check.rc > 0
 
   - name: Create Elastic Search Data directory
-    file: path="{{ inf_data_path }}/elasticsearch" state=directory group="{{ inf_group }}" owner="{{ elasticsearch_owner }}"
+    file: path="{{ inf_data_path }}/elasticsearch" state=directory group="{{ inf_group }}" owner="{{ elasticsearch_user }}"
 
   - name: Add consul key for elasticseach conf file
-    consul_kv:
+    consul_kv: 
       key: software/elasticsearch/conf/port
       value: "{{ elasticsearch_port }}"
 

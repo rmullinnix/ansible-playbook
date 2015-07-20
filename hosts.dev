@@ -6,8 +6,6 @@ msp0lnand[001:003].etdbw.com
 
 [consultemplate]
 msp0lnand001.etdbw.com
-msp0lnand002.etdbw.com
-msp0lmngd001.etdbw.com
 
 [consului]
 msp0lnand002.etdbw.com

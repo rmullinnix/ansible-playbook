@@ -1,0 +1,12 @@
+---
+- hosts: consultemplate
+  become: true
+
+  roles:
+    - consul-template
+
+- hosts: elasticsearch
+  sudo: yes
+
+  roles:
+    - elasticsearch

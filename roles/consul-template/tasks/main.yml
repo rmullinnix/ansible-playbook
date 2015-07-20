@@ -1,21 +1,24 @@
 ---
-  - name: Create consul-template config
-    template: src=consulagent.conf dest="{{ consul_template_config_file }}"
+  - name: Create consul-template configuration dir
+    file: path="{{ consul_template_config_dir }}" state=directory
 
-  - name: Create Consul bin dir
-    file: path={{ inf_app_path }}/consul-template/bin state=directory
+  - name: Create consul-template config
+    template: src="01-consul-template.conf" dest="{{ consul_template_config_dir }}/01-consul-template.conf"
+
+  - name: Create consul-template ctmpl dir
+    file: path="{{ consul_template_ctmpl_dir }}" state=directory
+
+  - name: Create consul-template bin dir
+    file: path="{{ inf_app_path }}/consul-template/bin" state=directory
 
   - name: Install consul-template
-    copy: src="/usr/nano/build/{{ ansible_environment}}/consul-template/bin/consul-template" mode=744 dest="{{ inf_app_path }}consul-template/bin/consul-template"
-
-  - name: Create consul-template config folder
-    file: path={{ consul_config_dir }} state=directory
+    copy: src="/usr/nano/build/{{ ansible_environment}}/consul-template/consul-template" mode=744 dest="{{ inf_app_path }}/consul-template/consul-template"
 
   - name: Install consul-tempplate init.d script
     template: src=consul-template.init.d mode=744 dest=/etc/init.d/consul-template
 
   - name: Run insserv to install service
-    command: /sbin/insserv -f consul-template
+    command: "/sbin/insserv -f consul"
 
   - name: Start consul-template service
-    command: /etc/init.d/consul-template start
+    service: name=consul-template state=restarted

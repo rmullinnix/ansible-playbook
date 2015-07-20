@@ -1,3 +1,4 @@
 ---
 elasticsearch_user: nanolog
-easticsearch_group: nanocore
+elasticsearch_group: nanocore
+elasticsearch_port: 9200
