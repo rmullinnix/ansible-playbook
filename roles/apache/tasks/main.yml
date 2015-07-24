@@ -5,26 +5,31 @@
   - name: Create apache user
     user: name="{{ apache_user }}" comment="Apache dameon account" group="{{ apache_group }}"
 
-  - name: Create apache application directory
-    file: path="{{ inf_app_path }}/apache2" state=directory owner="{{ apache_user }}" group="{{ apache_group }}" mode=744
+  - name: Create apache application directory / doc root
+    file: path={{ item }} state=directory owner="{{ apache_user }}" group="{{ apache_group }}" mode=755
+    with_items:
+      - "{{ inf_app_path }}/apache2"
+      - "{{ apache_doc_root }}"
 
   - name: Copy and extract apache2
     unarchive: src=/usr/nano/build/dev/apache2/apache2.tar.gz dest="{{ inf_app_path}}/apache2" owner="{{ apache_user }}" group="{{ apache_group }}"
 
   - name: Create apache httpd.conf
-    template: src=httpd.conf dest="{{ inf_app_path }}/apache2/conf/httpd.conf" owner="{{ apache_user }}" group="{{ apache_group }}"
+    template: src={{ item.src }} dest={{ item.dest }} owner="{{ apache_user }}" group="{{ apache_group }}"
+    with_items:
+      - { src: "httpd.conf", dest: "{{ inf_app_path }}/apache2/conf/httpd.conf" }
+      - { src: "envvars", dest: "{{ inf_app_path }}/apache2/bin/envvars" }
+    notify: restart apache
 
-  - name: Create apache envvars
-    template: src=envvars dest="{{ inf_app_path }}/apache2/bin/envvars" owner="{{ apache_user }}" group="{{ apache_group }}"
-
-  - name: Create apache directory root
-    file: path={{ apache_doc_root }} state=directory owner="{{ apache_user }}" group="{{ apache_group }}" mode=744
-
-  - name: Create apache init.d script
+  - name: Create apache init.d script, consul json
     template: src=init.d.apache2 dest=/etc/init.d/apache2 mode=744
+    notify:
+      - install apache
+      - restart apache
 
-  - name: Run insserv to install apache service
-    command: /sbin/insserv -f apache2
+  - name: Create consul json file
+    template: src=apache2.json dest=/etc/consul.d/apache2.json mode=744
+    notify: consul refresh
 
-  - name: Start apache service
-    service: name=apache2 state=restarted
+  - name: Copy apache status utility
+    copy: src="/usr/nano/build/{{ ansible_environment }}/status-utils/apache_status" dest="{{ inf_app_path }}/apache2/bin/apache_status" mode=755 owner="{{ apache_user }}" group="{{ apache_group }}"

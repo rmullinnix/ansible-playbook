@@ -1,38 +1,8 @@
 ---
-# This Playbook deploys the code and infrastructure to run a Web based application
-#   js front-end and rest based services backend
+# This Playbook deploys the code and infrastructure to run a consul cluster
+#   with ELK (elasticsearch, logstash, and kibana)
+#   as well as the UI components for consul and Kibana
 
-# setup commond directory structure and users/groups
-- hosts: all
-  roles:
-    - role: common
-
-# setup and deploy consul servers and consul agents
-- hosts: consul_servers
-  tasks:
-    -include: consul.yml
-
-# deploy mongo replication cluster
-- hosts: dbservers
-  roles:
-    -role: mongod
-
-# deploy haproxy load balancer and consul integration
-- hosts: load_balancer
-  roles:
-    -role: haproxy
-
-# deploy centralized log file collection
-- hosts: elk_server
-  roles:
-    -role: elk_stack
-
-# deploy apache and admin front ends
-- hosts: web_servers
-  tasks:
-    -include: web_servers.yml
-
-# deploy application components
-- hosts: application
-  tasks:
-    -include: application.yml
+- include: clustering.yml
+- include: webservers.yml
+- include: logging.yml

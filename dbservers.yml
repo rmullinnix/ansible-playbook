@@ -1,0 +1,9 @@
+---
+# This Playbook deploys mongodb
+
+# deploy mongo
+- hosts: dbservers
+  become: yes
+
+  roles:
+    - role: mongodb

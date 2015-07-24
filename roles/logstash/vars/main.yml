@@ -1,0 +1,4 @@
+---
+logstash_user: "logstash"
+logstash_group: "nanocore"
+logstash_port: 5075

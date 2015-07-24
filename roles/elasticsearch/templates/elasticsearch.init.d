@@ -103,8 +103,7 @@ force_reload() {
 }
  
 rh_status() {
-    checkproc -p $PID_FILE $DAEMON
-    $DAEMON -v
+    $ES_HOME/bin/es_status {{ elasticsearch_port }}
     rc_status -v
 }
  

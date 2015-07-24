@@ -1,46 +1,38 @@
 #!/bin/bash
 #
-# consul        Manage the consul agent
+# kibana        Dashboard tool for log viewing
 #       
 # chkconfig:   2345 95 95
-# description: Consul is a tool for service discovery and configuration
-# processname: consul
-# config: /etc/sysconfig/consul.d
-# pidfile: /var/run/consul.pid
+# description: Kibana is a tool for creating dashboards from log data stored in elasticsearch
+# processname: kibana
+# config: /usr/nano/kibana/current/config
+# pidfile: /var/run/kibana.pid
  
 ### BEGIN INIT INFO
-# Provides:       consul
+# Provides:       kibana
 # Required-Start: $local_fs $network
 # Required-Stop:
 # Should-Start:
 # Should-Stop:
 # Default-Start: 2 3 4 5
 # Default-Stop:  0 1 6
-# Short-Description: Manage the consul agent
-# Description: Consul is a tool for service discovery and configuration
+# Short-Description: Manage the kibana daemon
+# Description: Kibana is a tool for creating dashboards from log data stored in elasticsearch
 ### END INIT INFO
 . /etc/rc.status
 rc_reset
  
-prog="consul"
-user="{{ consul_user }}"
-group="{{ consul_group }}"
-exec="{{ consul_app_path }}/bin/$prog"
+prog="kibana"
+user="{{ kibana_user }}"
+group="{{ kibana_group }}"
+exec="{{ inf_app_path }}/kibana/current/bin/$prog"
 pidfile="/var/run/$prog.pid"
-lockfile="/var/lock/subsys/$prog"
-logfile="{{ consul_log_dir}}/$prog"
-conffile="/etc/consul.conf"
-confdir="/etc/consul.d"
- 
-# pull in sysconfig settings
-[ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
- 
-export GOMAXPROCS=${GOMAXPROCS:-2}
+logfile="{{ inf_log_path }}/$prog.log"
+confdir="{{ inf_app_path }}/kibana/current/config"
  
 start() {
     [ -x $exec ] || exit 5
     
-    [ -f $conffile ] || exit 6
     [ -d $confdir ] || exit 6
  
     umask 077
@@ -50,7 +42,7 @@ start() {
  
     ulimit -v unlimited
 
-    echo -n $"Starting $prog: $1"
+    echo -n $"Starting: $1"
 
     ## holy shell shenanigans, batman!
     ## daemon can't be backgrounded.  we need the pid of the spawned process,
@@ -59,12 +51,12 @@ start() {
     /sbin/start_daemon -f \
         -p $pidfile \
         -u $user \
-		$exec agent -config-file=$conffile -config-dir=$confdir 2>&1 >> $logfile & echo $! > $pidfile
+		$exec --quiet & echo $! > $pidfile
     
     RETVAL=$?
     echo
     
-    [ $RETVAL -eq 0 ] && touch $lockfile
+    [ $RETVAL -eq 0 ]
     
     return $RETVAL
 }
@@ -72,7 +64,7 @@ start() {
 stop() {
     echo -n $"Shutting down $prog: "
     ## graceful shutdown with SIGINT
-    /sbin/start-stop-daemon -K -p $pidfile -u $user -x $exec -s 2
+    /sbin/start-stop-daemon -K -p $pidfile -u $user
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && rm -f $lockfile
@@ -81,7 +73,6 @@ stop() {
  
 restart() {
     stop
-    sleep 4
     start
 }
  
@@ -96,8 +87,7 @@ force_reload() {
 }
  
 rh_status() {
-    checkproc -p $pidfile $exec
-    $exec version
+    {{ inf_app_path }}/kibana/current/bin/kibana_status {{ kibana_port }}
     rc_status -v
 }
  
@@ -118,6 +108,9 @@ case "$1" in
     reload)
         $1
         ;;
+    bootstrap)
+        start $1
+        ;;
     force-reload)
         force_reload
         ;;
@@ -125,7 +118,7 @@ case "$1" in
         rh_status
         ;;
     *)
-        echo $"Usage: $0 {start|stop|status|restart|reload|force-reload}"
+        echo $"Usage: $0 {start|stop|status|restart|bootstrap|reload|force-reload}"
         exit 2
 esac
  

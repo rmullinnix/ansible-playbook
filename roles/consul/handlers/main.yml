@@ -1,0 +1,10 @@
+---
+# file: roles/consul/handlers/main.yml
+- name: install consul
+  command: /sbin/insserv -f consul
+
+- name: restart consul
+  service: name=consul state=restarted
+
+- name: refresh consul
+  shell: 'kill -1 $(cat /var/run/consul.pid)'

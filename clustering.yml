@@ -1,0 +1,24 @@
+---
+# This Playbook deploys the consul componets for consul server,
+#   consul agent, and consul-template
+#   consului is deployed with the webservers group
+
+# setup and deploy consul servers and consul agents
+- hosts: consulservers
+  become: yes
+
+  roles:
+    - role: consul
+
+- hosts: consulagents
+  become: yes
+
+  roles:
+    - role: consul
+
+# setup and deploy consul-template
+- hosts: consultemplate
+  become: yes
+
+  roles:
+    - role: consul-template

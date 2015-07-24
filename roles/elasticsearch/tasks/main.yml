@@ -18,11 +18,12 @@
     command: rpm -i "/tmp/{{ jdk_rpm }}"
     when: rpm_check.rc == 1
 
-  - name: Ensure proper directory permissions
-    file: path="{{ inf_app_path }}/elasticsearch" state=directory group="{{ inf_group }}"
-
-  - name: Create log directory
-    file: path="{{ inf_log_path }}/elasticsearch" state=directory group="{{ inf_group }}"
+  - name: Create directory structure (app, log, data)
+    file: path={{ item }} state=directory group={{ inf_group }} owner={{ elasticsearch_user }}
+    with_items:
+      - "{{ inf_app_path }}/elasticsearch"
+      - "{{ inf_log_path }}/elasticsearch"
+      - "{{ inf_data_path }}/elasticsearch"
 
   - name: Check for current version
     command: "{{ inf_app_path }}/elasticsearch/current/bin/elasticsearch -v"
@@ -33,14 +34,11 @@
     unarchive: src="/usr/nano/build/{{ ansible_environment }}/elasticsearch/elasticsearch.tar.gz" dest="{{ inf_app_path }}/elasticsearch" owner="{{ elasticsearch_user }}" group="{{ inf_group }}"
     when: vers_check.rc > 0
 
-  - name: Create Elastic Search Data directory
-    file: path="{{ inf_data_path }}/elasticsearch" state=directory group="{{ inf_group }}" owner="{{ elasticsearch_user }}"
-
-  - name: Add bootstrap program
-    copy: src="/usr/nano/build/{{ ansible_environment }}/bootstrap/bootstrap" dest=/tmp/bootstrap mode=777
-
-  - name: Add bootstrap conf file
-    copy: src=bs_elasticsearch.conf dest=/tmp/bs_elasticsearch.conf
+  - name: Add bootstrap program and config
+    copy: src="{{ item.src }}" dest={{ item.dest }} mode=777
+    with_items:
+      - { src: "/usr/nano/build/{{ ansible_environment }}/bootstrap/bootstrap", dest: "/tmp/bootstrap" }
+      - { src: "bs_elasticsearch.conf", dest: "/tmp/bs_elasticsearch.conf" }
 
   - name: Add bootstrap tmpl file
     template: src=bs_elasticsearch.tmpl dest=/tmp/bs_elasticsearch.tmpl
@@ -48,20 +46,27 @@
   - name: Run bootstrap process
     command: /tmp/bootstrap -conf=/tmp/bs_elasticsearch.conf -tmpl=/tmp/bs_elasticsearch.tmpl
 
-  - name: Add consul-template config file
-    template: src=consul-template.conf dest=/etc/consul-template/conf.d/elasticsearch
-
   - name: Add consul-template ctmpl file
     copy: src=elasticsearch.ctmpl dest=/etc/consul-template/ctmpl/elasticsearch.ctmpl
 
-  - name: Install elasticsearch init.d script
-    template: src=elasticsearch.init.d dest=/etc/init.d/elasticsearch mode=744
+  - name: Add files (consul-template conf, consul conf, init.d)
+    template: src={{ item.src }} dest={{ item.dest }} mode=744
+    with_items:
+      - { src: "consul-template.conf", dest: "/etc/consul-template/conf.d/elasticsearch" }
+      - { src: "elasticsearch.json", dest: "/etc/consul.d/elasticsearch.json" }
+      - { src: "elasticsearch.init.d", dest: "/etc/init.d/elasticsearch" }
+
+  - name: Add elasticsearch status utility
+    copy: src="/usr/nano/build/{{ ansible_environment }}/status-utils/es_status" dest="{{ inf_app_path }}/elasticsearch/current/bin/es_status" mode=777
 
   - name: Install elasticsearch as service
     command: /sbin/insserv -f elasticsearch
 
-  - name: Restart consul-template service (should start elasticsearch)
-    service: name=consul-template state=restarted
+  - name: Refresh consul-template
+    shell: 'kill -1 $(cat /var/run/consul-template.pid)'
+
+  - name: Refresh consul
+    shell: 'kill -1 $(cat /var/run/consul.pid)'
 
 #  - name: Start elasticsearch service
 #    service: name=elasticsearch state=restarted

@@ -1,46 +1,39 @@
 #!/bin/bash
 #
-# consul        Manage the consul agent
+# logstash        Centralized log collection
 #       
 # chkconfig:   2345 95 95
-# description: Consul is a tool for service discovery and configuration
-# processname: consul
-# config: /etc/sysconfig/consul.d
-# pidfile: /var/run/consul.pid
+# description: Logstash is a tool for centralizing the collection of log files
+# processname: logstash
+# config: /etc/logstash/conf.d
+# pidfile: /var/run/logstash.pid
  
 ### BEGIN INIT INFO
-# Provides:       consul
+# Provides:       logstash
 # Required-Start: $local_fs $network
 # Required-Stop:
 # Should-Start:
 # Should-Stop:
 # Default-Start: 2 3 4 5
 # Default-Stop:  0 1 6
-# Short-Description: Manage the consul agent
-# Description: Consul is a tool for service discovery and configuration
+# Short-Description: Manage the logstash daemon
+# Description: Logstash is a tool for centralizing the collection of log files
 ### END INIT INFO
 . /etc/rc.status
 rc_reset
  
-prog="consul"
-user="{{ consul_user }}"
-group="{{ consul_group }}"
-exec="{{ consul_app_path }}/bin/$prog"
+prog="logstash"
+user="{{ logstash_user }}"
+group="{{ logstash_group }}"
+exec="{{ inf_app_path}}/logstash/current/bin/$prog"
 pidfile="/var/run/$prog.pid"
 lockfile="/var/lock/subsys/$prog"
-logfile="{{ consul_log_dir}}/$prog"
-conffile="/etc/consul.conf"
-confdir="/etc/consul.d"
- 
-# pull in sysconfig settings
-[ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
- 
-export GOMAXPROCS=${GOMAXPROCS:-2}
+logfile="{{ inf_log_path }}/$prog.log"
+confdir="/etc/logstash/conf.d"
  
 start() {
     [ -x $exec ] || exit 5
     
-    [ -f $conffile ] || exit 6
     [ -d $confdir ] || exit 6
  
     umask 077
@@ -50,7 +43,7 @@ start() {
  
     ulimit -v unlimited
 
-    echo -n $"Starting $prog: $1"
+    echo -n $"Starting $prog"
 
     ## holy shell shenanigans, batman!
     ## daemon can't be backgrounded.  we need the pid of the spawned process,
@@ -59,7 +52,7 @@ start() {
     /sbin/start_daemon -f \
         -p $pidfile \
         -u $user \
-		$exec agent -config-file=$conffile -config-dir=$confdir 2>&1 >> $logfile & echo $! > $pidfile
+		$exec --config=$confdir --log=$logfile 2>&1 & echo $! > $pidfile
     
     RETVAL=$?
     echo
@@ -72,7 +65,7 @@ start() {
 stop() {
     echo -n $"Shutting down $prog: "
     ## graceful shutdown with SIGINT
-    /sbin/start-stop-daemon -K -p $pidfile -u $user -x $exec -s 2
+    /sbin/start-stop-daemon -K -p $pidfile -u $user
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && rm -f $lockfile
@@ -81,7 +74,6 @@ stop() {
  
 restart() {
     stop
-    sleep 4
     start
 }
  
@@ -97,7 +89,7 @@ force_reload() {
  
 rh_status() {
     checkproc -p $pidfile $exec
-    $exec version
+    $exec --version
     rc_status -v
 }
  
@@ -118,6 +110,9 @@ case "$1" in
     reload)
         $1
         ;;
+    bootstrap)
+        start $1
+        ;;
     force-reload)
         force_reload
         ;;
@@ -125,7 +120,7 @@ case "$1" in
         rh_status
         ;;
     *)
-        echo $"Usage: $0 {start|stop|status|restart|reload|force-reload}"
+        echo $"Usage: $0 {start|stop|status|restart|bootstrap|reload|force-reload}"
         exit 2
 esac
  

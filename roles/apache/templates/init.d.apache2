@@ -119,7 +119,7 @@ configtest)
     ERROR=$?
     ;;
 status)
-    $LYNX $STATUSURL | awk ' /process$/ { print; exit } { print } '
+    $homedir/bin/apache_status {{ apache_port }} 
     ;;
 fullstatus)
     $LYNX $STATUSURL

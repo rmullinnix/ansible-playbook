@@ -1,0 +1,20 @@
+---
+# This Playbook deploys elasticsearch and logstash
+
+# deploy elasticsearch
+- hosts: elasticsearch
+  become: yes
+
+  roles:
+    - role: elasticsearch
+
+# deploy logstash
+- hosts: logstash
+  become: yes
+
+  roles:
+    - role: logstash
+
+  handlers:
+    - include: roles/consul/handlers/main.yml
+    - include: roles/consul-template/handlers/main.yml

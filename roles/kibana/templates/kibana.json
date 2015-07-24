@@ -1,0 +1,11 @@
+{
+    "service": {
+        "name": "kibana",
+        "tags": ["master"],
+        "port": {{ kibana_port }},
+        "check": {
+            "script": "{{ inf_app_path }}/kibana/current/bin/kibana_status {{ kibana_port }}",
+            "interval": "300s"
+        }
+    }
+}

@@ -1,0 +1,4 @@
+---
+# file: roles/kibana/handlers/main.yml
+- name: install kibana
+  command: /sbin/insserv -f kibana

@@ -1,0 +1,7 @@
+output {
+  elasticsearch { {{range services}}{{if .Name | regexMatch "^elasticsearch"}}{{range service .Name}}
+    host => "{{.Address}}"
+    port => {{.Port}}{{end}}{{end}}{{end}}
+    protocol => http
+  }
+}

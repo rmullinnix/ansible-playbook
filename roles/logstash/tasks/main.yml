@@ -1,0 +1,80 @@
+---
+  - name: Ensure group is present
+    group: name="{{ inf_group }}" state=present
+
+  - name: Create user to be used by dameon processes
+    user: name="{{ logstash_user }}" comment="logstash log collector" group="{{ inf_group }}"
+
+  - name:  Check for java jdk
+    command: rpm -q jdk
+    register: rpm_check
+    failed_when: rpm_check.rc > 1
+
+  - name: Copy java jdk
+    copy: src=/usr/nano/build/{{ ansible_environment }}/jdk/{{ jdk_rpm }} dest=/tmp/{{ jdk_rpm }}
+    when: rpm_check.rc == 1
+
+  - name: Install java jdk
+    command: rpm -i /tmp/{{ jdk_rpm }}
+    when: rpm_check.rc == 1
+
+  - name: Create directory structure for app
+    file: path={{ item }} state=directory group={{ inf_group }} owner={{ logstash_user }}
+    with_items:
+      - "{{ inf_app_path }}/logstash"
+
+  - name: Copy and extract logstash
+    unarchive: src="/usr/nano/build/{{ ansible_environment }}/logstash/logstash.tar.gz" dest="{{ inf_app_path }}/logstash" owner={{ logstash_user }} group={{ inf_group }}
+
+  - name: Add bootstrap program and config
+    copy: src="{{ item.src }}" dest="{{ item.dest }}" mode=777
+    with_items:
+      - { src: "/usr/nano/build/{{ ansible_environment }}/bootstrap/bootstrap", dest: "/tmp/bootstrap" }
+      - { src: "bs_logstash.conf", dest: "/tmp/bs_logstash.conf" }
+
+  - name: Add bootstrap tmpl file
+    template: src=bs_logstash.tmpl dest=/tmp/bs_logstash.tmpl
+
+  - name: Run bootstrap process
+    command: /tmp/bootstrap -conf=/tmp/bs_logstash.conf -tmpl=/tmp/bs_logstash.tmpl
+
+  - name: Add consul-template ctmpl files
+    copy: src="{{ item.src }}" dest="{{ item.dest }}"
+    with_items:
+      - { src: "01-lumberjack-input.ctmpl", dest: "/etc/consul-template/ctmpl/01-lumberjack-input.ctmpl" }
+      - { src: "90-lumberjack-output.ctmpl", dest: "/etc/consul-template/ctmpl/90-lumberjack-output.ctmpl" }
+
+  - name: Add status utility
+    template: src="/usr/nano/build/{{ ansible_environment }}/status-utils/logstash_status.sh" dest="{{ inf_app_path }}/logstash/current/bin/logstash_status.sh" mode=755
+
+  - name: Convert templates (logstash-input, logstash-output, consul-template, consul json)
+    template: src={{ item.src }} dest={{ item.dest }} mode=744 owner={{ item.owner }}
+    with_items:
+      - { src: "logstash.init.d", dest: "/etc/init.d/logstash", owner: "root" }
+      - { src: "consul-template.input.conf", dest: "/etc/consul-template/conf.d/logstash-input", owner: "{{ logstash_user}}" }
+      - { src: "consul-template.output.conf", dest: "/etc/consul-template/conf.d/logstash-output", owner: "{{ logstash_user}}" }
+      - { src: "logstash.json", dest: "/etc/consul.d/logstash.json", owner: "root" }
+
+  - name: Copy ssl template
+    template: src=logstash.cnf dest=/etc/ssl/logstash.cnf
+
+  - name: Generate logstash-forwarder cert and key
+    command: openssl req -config /etc/ssl/logstash.cnf -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout {{ inf_app_path }}/logstash/current/logstash-forwarder.key -out /etc/ssl/certs/logstash-forwarder.crt
+
+  - name: Set key permissions
+    command: chown {{ logstash_user }} {{ inf_app_path }}/logstash/current/logstash-forwarder.key
+
+  - name: Retrieve logstash-forwarder cert
+    fetch: src=/etc/ssl/certs/logstash-forwarder.crt dest=files/logstash-forwarder.crt
+
+  - name: Install logstash as service
+    command: /sbin/insserv -f logstash
+
+  - name: Refresh consul-template
+    shell: 'kill -1 $(cat /var/run/consul-template.pid)'
+
+  - name: Refresh consul
+    shell: 'kill -1 $(cat /var/run/consul.pid)'
+
+#  - name: Start logstash service
+#    service: name=logstash state=restarted

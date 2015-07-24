@@ -1,0 +1,17 @@
+---
+# This Playbook deploys the components for the webserver
+#   Apache, consului and kibana
+
+# setup and deploy apache
+- hosts: webservers
+  become: yes
+
+  roles:
+    - role: common
+    - role: apache
+    - role: consului
+    - role: kibana
+
+  handlers:
+    - include: roles/consul/handlers/main.yml
+    - include: roles/consul-template/handlers/main.yml

@@ -1,0 +1,66 @@
+---
+  - name: Ensure group is present
+    group: name="{{ inf_group }}" state=present
+
+  - name: Create user to be used by dameon processes
+    user: name="{{ kibana_user }}" comment="Kibana dashboard" group="{{ inf_group }}"
+
+  - name:  Check for java jdk
+    command: rpm -q jdk
+    register: rpm_check
+    failed_when: rpm_check.rc > 1
+
+  - name: Copy java jdk
+    copy: src=/usr/nano/build/{{ ansible_environment }}/jdk/{{ jdk_rpm }} dest=/tmp/{{ jdk_rpm }}
+    when: rpm_check.rc == 1
+
+  - name: Install java jdk
+    command: rpm -i /tmp/{{ jdk_rpm }}
+    when: rpm_check.rc == 1
+
+  - name: Create directory structure (app, log, data)
+    file: path={{ item }} state=directory group={{ inf_group }} owner={{ kibana_user }}
+    with_items:
+      - "{{ inf_app_path }}/kibana"
+      - "{{ inf_log_path }}/kibana"
+      - "{{ inf_data_path }}/kibana"
+
+  - name: Copy and extract kibana
+    unarchive: src="/usr/nano/build/{{ ansible_environment }}/kibana/kibana.tar.gz" dest="{{ inf_app_path }}/kibana" owner={{ kibana_user }} group={{ inf_group }}
+
+  - name: Add bootstrap program and config
+    copy: src="{{ item.src }}" dest={{ item.dest }} mode=777
+    with_items:
+      - { src: "/usr/nano/build/{{ ansible_environment }}/bootstrap/bootstrap", dest: "/tmp/bootstrap" }
+      - { src: "bs_kibana.conf", dest: "/tmp/bs_kibana.conf" }
+
+  - name: Add bootstrap tmpl file
+    template: src=bs_kibana.tmpl dest=/tmp/bs_kibana.tmpl
+
+  - name: Run bootstrap process
+    command: /tmp/bootstrap -conf=/tmp/bs_kibana.conf -tmpl=/tmp/bs_kibana.tmpl
+
+  - name: Add consul-template ctmpl file
+    copy: src=kibana.ctmpl dest=/etc/consul-template/ctmpl/kibana.ctmpl
+
+  - name: Add status utility
+    copy: src="/usr/nano/build/{{ ansible_environment }}/status-utils/kibana_status" dest="{{ inf_app_path }}/kibana/current/bin/kibana_status" mode=755
+
+  - name: Convert template init.d
+    template: src=kibana.init.d dest=/etc/init.d/kibana mode=744
+    notify: install kibana
+
+  - name: Convert template consul-template
+    template: src=consul-template.conf dest=/etc/consul-template/conf.d/kibana mode=744
+    notify: refresh consul-template
+
+  - name: Convert template consul-template
+    template: src=kibana.json dest=/etc/consul.d/kibana.json mode=744
+    notify: refresh consul
+
+  - name: Add apache mod_proxy to connect to consul
+    lineinfile: dest="{{ inf_app_path }}/apache2/conf/httpd.conf" regexp={{ item.regex }} insertafter="^#ProxyPass" line={{ item.line }}
+    with_items:
+      - { regex: "^ProxyPass /kibana", line: "ProxyPass /kibana/ http://localhost:{{ kibana_port }}/" }
+      - { regex: "^ProxyPassReverse /kibana", line: "ProxyPassReverse /kibana/ http://localhost:{{ kibana_port }}/" }
+    notify: restart apache

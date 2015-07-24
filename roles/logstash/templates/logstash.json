@@ -1,0 +1,11 @@
+{
+    "service": {
+        "name": "logstash",
+        "tags": ["master"],
+        "port": {{ logstash_port }},
+        "check": {
+            "script": "{{ inf_app_path }}/logstash/current/bin/logstash_status.sh",
+            "interval": "300s"
+        }
+    }
+}

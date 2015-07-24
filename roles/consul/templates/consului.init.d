@@ -31,6 +31,7 @@ lockfile="/var/lock/subsys/$prog"
 logfile="{{ consul_log_dir}}/$prog"
 conffile="/etc/consul.conf"
 confdir="/etc/consul.d"
+uidir="{{ apache_doc_root }}/consului"
  
 # pull in sysconfig settings
 [ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
@@ -59,7 +60,7 @@ start() {
     /sbin/start_daemon -f \
         -p $pidfile \
         -u $user \
-		$exec agent -config-file=$conffile -config-dir=$confdir 2>&1 >> $logfile & echo $! > $pidfile
+		$exec agent -config-file=$conffile -config-dir=$confdir -ui-dir=$uidir 2>&1 >> $logfile & echo $! > $pidfile
     
     RETVAL=$?
     echo
