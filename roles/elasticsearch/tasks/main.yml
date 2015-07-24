@@ -5,21 +5,8 @@
   - name: Create user to be used by dameon processes
     user: name="{{ elasticsearch_user }}" comment="Nanotech Logging Services" group="{{ inf_group }}"
 
-  - name:  Check for java jdk
-    command: rpm -q jdk
-    register: rpm_check
-    failed_when: rpm_check.rc > 1
-
-  - name: Copy java jdk
-    copy: src="/usr/nano/build/{{ ansible_environment }}/jdk/{{ jdk_rpm }}" dest="/tmp/{{ jdk_rpm }}"
-    when: rpm_check.rc == 1
-
-  - name: Install java jdk
-    command: rpm -i "/tmp/{{ jdk_rpm }}"
-    when: rpm_check.rc == 1
-
   - name: Create directory structure (app, log, data)
-    file: path={{ item }} state=directory group={{ inf_group }} owner={{ elasticsearch_user }}
+    file: path={{ item }} state=directory group={{ inf_group }} owner={{ elasticsearch_user }} mode=755
     with_items:
       - "{{ inf_app_path }}/elasticsearch"
       - "{{ inf_log_path }}/elasticsearch"
@@ -46,27 +33,23 @@
   - name: Run bootstrap process
     command: /tmp/bootstrap -conf=/tmp/bs_elasticsearch.conf -tmpl=/tmp/bs_elasticsearch.tmpl
 
+  - name: Add elasticsearch status utility
+    copy: src="/usr/nano/build/{{ ansible_environment }}/status-utils/es_status" dest="{{ inf_app_path }}/elasticsearch/current/bin/es_status" mode=755
+
   - name: Add consul-template ctmpl file
     copy: src=elasticsearch.ctmpl dest=/etc/consul-template/ctmpl/elasticsearch.ctmpl
+    notify: refresh consul-template
 
-  - name: Add files (consul-template conf, consul conf, init.d)
-    template: src={{ item.src }} dest={{ item.dest }} mode=744
-    with_items:
-      - { src: "consul-template.conf", dest: "/etc/consul-template/conf.d/elasticsearch" }
-      - { src: "elasticsearch.json", dest: "/etc/consul.d/elasticsearch.json" }
-      - { src: "elasticsearch.init.d", dest: "/etc/init.d/elasticsearch" }
+  - name: Add file consul-template conf
+    template: src=consul-template.conf dest=/etc/consul-template/conf.d/elasticsearch mode=744
+    notify: refresh consul-template
 
-  - name: Add elasticsearch status utility
-    copy: src="/usr/nano/build/{{ ansible_environment }}/status-utils/es_status" dest="{{ inf_app_path }}/elasticsearch/current/bin/es_status" mode=777
+  - name: Add file consul service config
+    template: src=elasticsearch.json dest=/etc/consul.d/elasticsearch.json mode=744
+    notify: refresh consul
 
-  - name: Install elasticsearch as service
-    command: /sbin/insserv -f elasticsearch
-
-  - name: Refresh consul-template
-    shell: 'kill -1 $(cat /var/run/consul-template.pid)'
-
-  - name: Refresh consul
-    shell: 'kill -1 $(cat /var/run/consul.pid)'
-
-#  - name: Start elasticsearch service
-#    service: name=elasticsearch state=restarted
+  - name: Add file init.d script
+    template: src=elasticsearch.init.d dest=/etc/init.d/elasticsearch mode=744
+    notify:
+      - install elasticsearch
+      - restart elasticsearch

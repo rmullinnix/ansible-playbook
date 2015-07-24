@@ -1,0 +1,13 @@
+---
+  - name:  Check for java jdk
+    command: rpm -q jdk
+    register: rpm_check
+    failed_when: rpm_check.rc > 1
+
+  - name: Copy java jdk
+    copy: src="/usr/nano/build/{{ ansible_environment }}/jdk/{{ jdk_rpm }}" dest="/tmp/{{ jdk_rpm }}"
+    when: rpm_check.rc == 1
+
+  - name: Install java jdk
+    command: rpm -i "/tmp/{{ jdk_rpm }}"
+    when: rpm_check.rc == 1

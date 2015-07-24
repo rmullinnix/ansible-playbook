@@ -1,0 +1,18 @@
+---
+# file: roles/logstash/handlers/main.yml
+- name: install logstash
+  command: /sbin/insserv -f logstash
+
+- name: restart logstash
+  service: name=logstash state=restarted
+
+- name: generate lscert
+  command: openssl req -config /etc/ssl/logstash.cnf -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout {{ inf_app_path }}/logstash/current/logstash-forwarder.key -out /etc/ssl/certs/logstash-forwarder.crt
+  notify: generate lscert2
+
+- name: generate lscert2
+  command: chown {{ logstash_user }} {{ inf_app_path }}/logstash/current/logstash-forwarder.key
+  notify: generate lscert3
+
+- name: generate lscert3
+  fetch: src=/etc/ssl/certs/logstash-forwarder.crt dest=files/logstash-forwarder.crt

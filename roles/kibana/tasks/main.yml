@@ -5,19 +5,6 @@
   - name: Create user to be used by dameon processes
     user: name="{{ kibana_user }}" comment="Kibana dashboard" group="{{ inf_group }}"
 
-  - name:  Check for java jdk
-    command: rpm -q jdk
-    register: rpm_check
-    failed_when: rpm_check.rc > 1
-
-  - name: Copy java jdk
-    copy: src=/usr/nano/build/{{ ansible_environment }}/jdk/{{ jdk_rpm }} dest=/tmp/{{ jdk_rpm }}
-    when: rpm_check.rc == 1
-
-  - name: Install java jdk
-    command: rpm -i /tmp/{{ jdk_rpm }}
-    when: rpm_check.rc == 1
-
   - name: Create directory structure (app, log, data)
     file: path={{ item }} state=directory group={{ inf_group }} owner={{ kibana_user }}
     with_items:

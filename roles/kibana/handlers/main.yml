@@ -2,3 +2,6 @@
 # file: roles/kibana/handlers/main.yml
 - name: install kibana
   command: /sbin/insserv -f kibana
+
+- name: restart kibana
+  service: name=kibana state=restarted
