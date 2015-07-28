@@ -6,12 +6,18 @@
 - hosts: webservers
   become: yes
 
+  handlers:
+    - include: roles/consul-template/handlers/main.yml
+
   roles:
     - role: common
     - role: apache
     - role: consului
     - role: kibana
 
-  handlers:
-    - include: roles/consul/handlers/main.yml
-    - include: roles/consul-template/handlers/main.yml
+  post_tasks:
+    - name: refresh consul
+      shell: 'kill -1 $(cat /var/run/consul.pid)'
+
+    - name: refresh consul-template
+      shell: 'kill -1 $(cat /var/run/consul-template.pid)'

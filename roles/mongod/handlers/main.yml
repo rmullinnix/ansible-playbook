@@ -1,0 +1,7 @@
+---
+# file: roles/mongod/handlers/main.yml
+- name: install mongod
+  command: /sbin/insserv -f mongod
+
+- name: restart mongod
+  service: name=mongod state=restarted

@@ -8,12 +8,12 @@
 
   - name: Install consul-template
     copy: src="/usr/nano/build/{{ ansible_environment}}/consul-template/consul-template" mode=744 dest="{{ inf_app_path }}/consul-template/consul-template"
-    notify: restart consul-template
+    notify: restart consultemplate
 
   - name: Process templates init.d
     template: src=consul-template.init.d dest=/etc/init.d/consul-template mode=744
-    notify: install consul-template
+    notify: install consultemplate
 
   - name: Process config template
     template: src=01-consul-template.conf dest="{{ consul_template_config_dir }}/01-consul-template.conf" mode=744
-    notify: refresh consul-template
+    notify: refresh consultemplate

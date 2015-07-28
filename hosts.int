@@ -1,5 +1,5 @@
 [consulagents]
-msp0lmngd001.etdbw.com
+msp0lmngi001.etdbw.com
 
 [consulservers]
 msp0lnand[001:003].etdbw.com
@@ -7,7 +7,7 @@ msp0lnand[001:003].etdbw.com
 [consultemplate]
 msp0lnand001.etdbw.com
 msp0lnand002.etdbw.com
-msp0lmngd001.etdbw.com
+msp0lmngi001.etdbw.com
 
 [consului]
 msp0lnand002.etdbw.com
@@ -16,7 +16,7 @@ msp0lnand002.etdbw.com
 msp0lnand002.etdbw.com
 
 [dbservers]
-msp0lmngd001.etdbw.com
+msp0lmngi001.etdbw.com
 
 [elasticsearch]
 msp0lnand001.etdbw.com
@@ -27,7 +27,7 @@ msp0lnand001.etdbw.com host_ip=10.80.129.197
 [webservers]
 msp0lnand002.etdbw.com
 
-[development:children]
+[integration:children]
 consulagents
 consulservers
 dbservers

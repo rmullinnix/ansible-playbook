@@ -38,11 +38,11 @@
 
   - name: Add consul-template ctmpl file
     copy: src=elasticsearch.ctmpl dest=/etc/consul-template/ctmpl/elasticsearch.ctmpl
-    notify: refresh consul-template
+    notify: refresh consultemplate
 
   - name: Add file consul-template conf
     template: src=consul-template.conf dest=/etc/consul-template/conf.d/elasticsearch mode=744
-    notify: refresh consul-template
+    notify: refresh consultemplate
 
   - name: Add file consul service config
     template: src=elasticsearch.json dest=/etc/consul.d/elasticsearch.json mode=744

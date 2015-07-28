@@ -1,0 +1,19 @@
+systemLog:
+   path: "{{ key "software/mongod/conf/systemLog/path" }}"
+   destination: file
+   verbosity: {{ key "software/mongod/conf/systemLog/verbosity" }}
+   quiet: {{ key "software/mongod/conf/systemLog/quiet" }}
+   logAppend: true
+   traceAllExceptions: {{ key "software/mongod/conf/systemLog/traceAllException" }}
+storage:
+   journal:
+      enabled: true
+   dbPath: {{ key "software/mongod/conf/storage/dbPath" }}
+processManagement:
+   fork: true
+   pidFilePath: "/var/run/mongodb/mongod.pid"
+net:
+   port: {{ key "software/mongod/conf/net/port" }}
+security:
+   keyFile: {{ key "software/mongod/conf/security/keyFile" }}
+   clusterAuthMode: "keyFile"

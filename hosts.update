@@ -1,0 +1,4 @@
+#! /usr/bin/sed -i
+s/msp0lnand001.etdbw.com/msp0lnand001.etdbw.com host_ip=10.80.129.197/g
+s/msp0lnand002.etdbw.com/msp0lnand002.etdbw.com host_ip=10.80.129.198/g
+s/msp0lnand003.etdbw.com/msp0lnand003.etdbw.com host_ip=10.80.129.199/g

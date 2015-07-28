@@ -1,7 +1,9 @@
 ---
 # file: roles/kibana/handlers/main.yml
 - name: install kibana
-  command: /sbin/insserv -f kibana
+  command: /sbin/insserv -f kibana{{ init_suffix }}
 
 - name: restart kibana
-  service: name=kibana state=restarted
+  service: name=kibana{{ init_suffix }} state=restarted
+
+- include: ../../consul-template/handlers/main.yml

@@ -30,14 +30,14 @@
     with_items:
       - { src: "01-lumberjack-input.ctmpl", dest: "/etc/consul-template/ctmpl/01-lumberjack-input.ctmpl" }
       - { src: "90-lumberjack-output.ctmpl", dest: "/etc/consul-template/ctmpl/90-lumberjack-output.ctmpl" }
-    notify: refresh consul-template
+    notify: refresh consultemplate
 
   - name: Convert templates (logstash-input, logstash-output)
     template: src={{ item.src }} dest={{ item.dest }} mode=744 owner={{ logstash_user }}
     with_items:
       - { src: "consul-template.input.conf", dest: "/etc/consul-template/conf.d/logstash-input" }
       - { src: "consul-template.output.conf", dest: "/etc/consul-template/conf.d/logstash-output" }
-    notify: refresh consul-template
+    notify: refresh consultemplate
 
   - name: Add status utility
     template: src="/usr/nano/build/{{ ansible_environment }}/status-utils/logstash_status.sh" dest="{{ inf_app_path }}/logstash/current/bin/logstash_status.sh" mode=755

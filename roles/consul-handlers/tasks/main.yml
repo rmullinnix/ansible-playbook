@@ -1,0 +1,3 @@
+---
+- name: dummy task
+  command: echo 'hello'

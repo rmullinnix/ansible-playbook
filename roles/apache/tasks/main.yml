@@ -22,14 +22,14 @@
     notify: restart apache
 
   - name: Create apache init.d script, consul json
-    template: src=init.d.apache2 dest=/etc/init.d/apache2 mode=744
+    template: src=init.d.apache2 dest=/etc/init.d/apache2{{ init_suffix }} mode=744
     notify:
       - install apache
       - restart apache
 
   - name: Create consul json file
     template: src=apache2.json dest=/etc/consul.d/apache2.json mode=744
-    notify: consul refresh
+    notify: refresh consul
 
   - name: Copy apache status utility
     copy: src="/usr/nano/build/{{ ansible_environment }}/status-utils/apache_status" dest="{{ inf_app_path }}/apache2/bin/apache_status" mode=755 owner="{{ apache_user }}" group="{{ apache_group }}"

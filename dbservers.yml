@@ -6,4 +6,11 @@
   become: yes
 
   roles:
-    - role: mongodb
+    - role: mongod
+
+  post_tasks:
+    - name: refresh consul
+      shell: 'kill -1 $(cat /var/run/consul.pid)'
+
+    - name: refresh consul-template
+      shell: 'kill -1 $(cat /var/run/consul-template.pid)'

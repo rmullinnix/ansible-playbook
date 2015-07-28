@@ -38,7 +38,7 @@ start() {
     [ -f $conffile ] || exit 6
     [ -d $confdir ] || exit 6
  
-    umask 077
+    umask 033
  
     touch $logfile $pidfile
     chown $user:$user $logfile $pidfile

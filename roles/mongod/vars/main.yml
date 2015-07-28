@@ -1,0 +1,5 @@
+---
+mongo_user: mongo
+mongo_group: nanocore
+mongod_port: 27017
+mongod_repl_set: ""

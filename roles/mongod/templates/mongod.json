@@ -1,0 +1,11 @@
+{
+    "service": {
+        "name": "mongod",
+        "tags": ["{{ mongod_deploy }}"],
+        "port": {{ mongod_port }},
+        "check": {
+            "script": "{{ inf_app_path }}/mongo/mongo_status.sh",
+            "interval": "300s"
+        }
+    }
+}

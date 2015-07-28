@@ -29,6 +29,7 @@
 
   - name: Add consul-template ctmpl file
     copy: src=kibana.ctmpl dest=/etc/consul-template/ctmpl/kibana.ctmpl
+    notify: refresh consultemplate
 
   - name: Add status utility
     copy: src="/usr/nano/build/{{ ansible_environment }}/status-utils/kibana_status" dest="{{ inf_app_path }}/kibana/current/bin/kibana_status" mode=755
@@ -39,7 +40,7 @@
 
   - name: Convert template consul-template
     template: src=consul-template.conf dest=/etc/consul-template/conf.d/kibana mode=744
-    notify: refresh consul-template
+    notify: refresh consultemplate
 
   - name: Convert template consul-template
     template: src=kibana.json dest=/etc/consul.d/kibana.json mode=744
