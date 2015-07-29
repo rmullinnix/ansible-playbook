@@ -31,25 +31,25 @@
     template: src=bs_elasticsearch.tmpl dest=/tmp/bs_elasticsearch.tmpl
 
   - name: Run bootstrap process
-    command: /tmp/bootstrap -conf=/tmp/bs_elasticsearch.conf -tmpl=/tmp/bs_elasticsearch.tmpl
+    command: /tmp/bootstrap -conf=/tmp/bs_elasticsearch.conf -tmpl=/tmp/bs_elasticsearch.tmpl -port={{ consul_port }}
 
   - name: Add elasticsearch status utility
     copy: src="/usr/nano/build/{{ ansible_environment }}/status-utils/es_status" dest="{{ inf_app_path }}/elasticsearch/current/bin/es_status" mode=755
 
   - name: Add consul-template ctmpl file
-    copy: src=elasticsearch.ctmpl dest=/etc/consul-template/ctmpl/elasticsearch.ctmpl
+    copy: src=elasticsearch.ctmpl dest={{ etc_conf }}/consul-template/ctmpl/elasticsearch.ctmpl
     notify: refresh consultemplate
 
   - name: Add file consul-template conf
-    template: src=consul-template.conf dest=/etc/consul-template/conf.d/elasticsearch mode=744
+    template: src=consul-template.conf dest={{ etc_conf }}/consul-template/conf.d/elasticsearch mode=744
     notify: refresh consultemplate
 
   - name: Add file consul service config
-    template: src=elasticsearch.json dest=/etc/consul.d/elasticsearch.json mode=744
+    template: src=elasticsearch.json.ctmpl dest={{ etc_conf }}/consul-template/ctmpl/elasticsearch.json.ctmpl mode=744
     notify: refresh consul
 
   - name: Add file init.d script
-    template: src=elasticsearch.init.d dest=/etc/init.d/elasticsearch mode=744
+    template: src=elasticsearch.init.d dest=/etc/init.d/elasticsearch{{ init_suffix }} mode=744
     notify:
       - install elasticsearch
       - restart elasticsearch

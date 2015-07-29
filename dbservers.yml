@@ -10,7 +10,7 @@
 
   post_tasks:
     - name: refresh consul
-      shell: 'kill -1 $(cat /var/run/consul.pid)'
+      shell: 'kill -1 $(cat {{ pid_path }}/consul.pid)'
 
     - name: refresh consul-template
-      shell: 'kill -1 $(cat /var/run/consul-template.pid)'
+      shell: 'kill -1 $(cat {{ pid_path }}/consul-template.pid)'

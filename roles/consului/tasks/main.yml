@@ -5,8 +5,8 @@
     file: path="{{ apache_doc_root }}/consului" state=directory owner="{{ apache_user }}" group="{{ apache_group }}" mode=744
 
   - name: Copy consul ui
-    copy: src=/usr/nano/build/dev/consului/ dest="{{ apache_doc_root}}/consului/" owner="{{ apache_user }}" group="{{ apache_group }}" mode=744
+    copy: src=/usr/nano/build/{{ ansible_environment }}/consului/ dest="{{ apache_doc_root}}/consului/" owner="{{ apache_user }}" group="{{ apache_group }}" mode=744
 
   - name: Add apache mod_proxy to connect to consul
-    lineinfile: dest="{{ inf_app_path }}/apache2/conf/httpd.conf" regexp="^ProxyPass /v1" insertafter="^#ProxyPass" line="ProxyPass /v1/ http://localhost:8500/v1/"
+    lineinfile: dest="{{ inf_app_path }}/apache2/conf/httpd.conf" regexp="^ProxyPass /v1" insertafter="^#ProxyPass" line="ProxyPass /v1/ http://localhost:{{ consul_port }}/v1/"
     notify: restart apache

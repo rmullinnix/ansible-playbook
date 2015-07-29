@@ -25,25 +25,25 @@
     template: src=bs_kibana.tmpl dest=/tmp/bs_kibana.tmpl
 
   - name: Run bootstrap process
-    command: /tmp/bootstrap -conf=/tmp/bs_kibana.conf -tmpl=/tmp/bs_kibana.tmpl
+    command: /tmp/bootstrap -conf=/tmp/bs_kibana.conf -tmpl=/tmp/bs_kibana.tmpl -port={{ consul_port }}
 
   - name: Add consul-template ctmpl file
-    copy: src=kibana.ctmpl dest=/etc/consul-template/ctmpl/kibana.ctmpl
+    copy: src=kibana.ctmpl dest={{ etc_conf }}/consul-template/ctmpl/kibana.ctmpl
     notify: refresh consultemplate
 
   - name: Add status utility
     copy: src="/usr/nano/build/{{ ansible_environment }}/status-utils/kibana_status" dest="{{ inf_app_path }}/kibana/current/bin/kibana_status" mode=755
 
   - name: Convert template init.d
-    template: src=kibana.init.d dest=/etc/init.d/kibana mode=744
+    template: src=kibana.init.d dest=/etc/init.d/kibana{{ init_suffix }} mode=744
     notify: install kibana
 
   - name: Convert template consul-template
-    template: src=consul-template.conf dest=/etc/consul-template/conf.d/kibana mode=744
+    template: src=consul-template.conf dest={{ etc_conf }}/consul-template/conf.d/kibana mode=744
     notify: refresh consultemplate
 
   - name: Convert template consul-template
-    template: src=kibana.json dest=/etc/consul.d/kibana.json mode=744
+    template: src=kibana.json dest={{ etc_conf }}/consul.d/kibana.json mode=744
     notify: refresh consul
 
   - name: Add apache mod_proxy to connect to consul

@@ -5,5 +5,3 @@
 
 - name: restart kibana
   service: name=kibana{{ init_suffix }} state=restarted
-
-- include: ../../consul-template/handlers/main.yml

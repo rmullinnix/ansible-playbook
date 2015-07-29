@@ -4,6 +4,14 @@
 			"software/logstash/conf/port": {
 				"value": "{{ logstash_port }}",
 				"encrypt": false
+			},
+			"software/logstash/conf/public_cert": {
+				"value": "/etc/ssl/certs/logstash-forwarder-{{ ansible_environment }}.crt",
+				"encrypt": false
+			},
+			"software/logstash/conf/private_key": {
+				"value": "{{ inf_app_path}}/logstash/current/logstash-forwarder.key",
+				"encrypt": false
 			}
 		}
 	}

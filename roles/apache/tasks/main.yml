@@ -5,6 +5,9 @@
   - name: Create apache user
     user: name="{{ apache_user }}" comment="Apache dameon account" group="{{ apache_group }}"
 
+  - name: Copy and extract /usr/local/lib
+    unarchive: src=/usr/nano/build/{{ ansible_environment }}/common/lib/usr_local_lib.tar.gz dest=/usr/local/lib
+
   - name: Create apache application directory / doc root
     file: path={{ item }} state=directory owner="{{ apache_user }}" group="{{ apache_group }}" mode=755
     with_items:
@@ -12,7 +15,7 @@
       - "{{ apache_doc_root }}"
 
   - name: Copy and extract apache2
-    unarchive: src=/usr/nano/build/dev/apache2/apache2.tar.gz dest="{{ inf_app_path}}/apache2" owner="{{ apache_user }}" group="{{ apache_group }}"
+    unarchive: src=/usr/nano/build/{{ ansible_environment }}/apache2/apache2.tar.gz dest="{{ inf_app_path}}/apache2" owner="{{ apache_user }}" group="{{ apache_group }}"
 
   - name: Create apache httpd.conf
     template: src={{ item.src }} dest={{ item.dest }} owner="{{ apache_user }}" group="{{ apache_group }}"
@@ -28,7 +31,7 @@
       - restart apache
 
   - name: Create consul json file
-    template: src=apache2.json dest=/etc/consul.d/apache2.json mode=744
+    template: src=apache2.json dest={{ etc_conf }}/consul.d/apache2.json mode=744
     notify: refresh consul
 
   - name: Copy apache status utility

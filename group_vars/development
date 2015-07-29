@@ -1,23 +1,47 @@
 ---
+# Deployment Environment - normally dev, int, stage, prod
 ansible_environment: dev
+
+# installation directories infrastructure executables, associated data, and log files
 inf_app_path: /usr/local
 inf_data_path: /usr/nano/data
 inf_log_path: /usr/nano/log
+
+# Common group used by infrastructure components
 inf_group: nanocore
-etc_conf: /etc/dev
+
+# Configuration directory
+etc_conf: /etc/{{ ansible_environment }}
+init_suffix: ""
+
+# Runtime process management
+pid_path: /var/run/{{ ansible_environment }}
+lock_path: /var/lock/{{ ansible_environment }}
+
+# Apache configuration information
 apache_port: 8040
 apache_admin: Rob.Mullinnix@assurant.com
-apache_doc_root: /var/httpd/dev
+apache_doc_root: /var/httpd/{{ ansible_environment }}
 apache_log_level: warn
+
+# Consul configuration
 consul_port: 8500
 consul_dns_port: 8600
 consul_rpc_port: 8400
 consul_serf_lan_port: 8301
 consul_serf_wan_port: 8302
 consul_server_port: 8300
+
+# Java version to install
 jdk_rpm: jdk-7u67-linux-x64.rpm
+
+# mongoDB configuration
+#   mongod_deploy:  single or cluster
 db_data_path: /var/mongo/data
 db_log_path: /var/mongo/log
 mongod_deploy: single
+
+# ELK configuration
 elasticsearch_port: 9200
+logstash_port: 5075
 kibana_port: 5601

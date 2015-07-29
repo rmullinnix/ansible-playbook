@@ -30,8 +30,8 @@ JAVA_HOME=/usr/bin/java   # Where java lives
 NAME=elasticsearch
 DESC=elasticsearch
 ES_HOME={{ inf_app_path}}/$NAME/current
-PID_FILE=/var/run/$NAME.pid
-LOCK_FILE=/var/lock/subsys/$NAME
+PID_FILE={{ pid_path }}/$NAME.pid
+LOCK_FILE={{ lock_path }}/subsys/$NAME
 LOG_DIR={{ inf_log_path }}/$NAME
 DATA_DIR={{ inf_data_path }}/$NAME
 CONFIG_FILE=$ES_HOME/config/$NAME.yml
@@ -48,7 +48,7 @@ start() {
     [ -f $CONFIG_FILE ] || exit 6
     [ -d $DATA_DIR ] || exit 7
  
-    umask 077
+    umask 033
  
     mkdir -p $LOG_DIR $DATA_DIR $WORK_DIR
     chown -R $USER:$GROUP $LOG_DIR $DATA_DIR $WORK_DIR

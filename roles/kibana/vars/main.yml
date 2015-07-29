@@ -1,3 +1,3 @@
 ---
 kibana_user: "kibana"
-kibana_group: "nanocore"
+kibana_group: "{{ inf_group }}"

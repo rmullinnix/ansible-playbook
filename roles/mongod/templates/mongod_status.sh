@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONFIGFILE="/etc/mongod.conf"
+CONFIGFILE="{{ etc_conf }}/mongod.conf"
 PIDFILE=`awk -F'[:=]' -v IGNORECASE=1 '/^[[:blank:]]*(processManagement\.)?pidfilepath[[:blank:]]*[:=][[:blank:]]*/{print $2}' "$CONFIGFILE" | tr -d "[:blank:]\"'"`
 PID=$(cat $PIDFILE)
 

@@ -1,0 +1,11 @@
+{
+        "service": {
+                "check": {
+                        "interval": "300s",
+                        "script": "{{ inf_app }}/elasticsearch/current/bin/es_status {% raw %}{{ key "software/elasticsearch/conf/port" }}{% endraw %}"
+                },
+                "name": "elasticsearch",
+                "port": {% raw %}{{ key "software/elasticsearch/conf/port" }}{% endraw %},
+                "tags": ["master"]
+        }
+}

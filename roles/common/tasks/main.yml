@@ -1,3 +1,10 @@
 ---
-  - name: Copy and extract /usr/local/lib
-    unarchive: src=/usr/nano/build/dev/common/lib/usr_local_lib.tar.gz dest=/usr/local/lib
+  - name: Create main directorys (etc config, pid path, and lock path)
+    file: path={{ item }} state=directory mode=755
+    with_items:
+      - "{{ etc_conf }}"
+      - "{{ pid_path }}"
+      - "{{ lock_path }}"
+      - "{{ inf_app_path }}"
+      - "{{ inf_log_path }}"
+      - "{{ inf_data_path }}"

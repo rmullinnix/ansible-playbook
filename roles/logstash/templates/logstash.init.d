@@ -26,17 +26,17 @@ prog="logstash"
 user="{{ logstash_user }}"
 group="{{ logstash_group }}"
 exec="{{ inf_app_path}}/logstash/current/bin/$prog"
-pidfile="/var/run/$prog.pid"
-lockfile="/var/lock/subsys/$prog"
+pidfile="{{ pid_path }}/$prog.pid"
+lockfile="{{ lock_path }}/subsys/$prog"
 logfile="{{ inf_log_path }}/$prog.log"
-confdir="/etc/logstash/conf.d"
+confdir="{{ etc_conf }}/logstash/conf.d"
  
 start() {
     [ -x $exec ] || exit 5
     
     [ -d $confdir ] || exit 6
  
-    umask 077
+    umask 033
  
     touch $logfile $pidfile
     chown $user:$group $logfile $pidfile

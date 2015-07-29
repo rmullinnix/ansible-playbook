@@ -1,5 +1,5 @@
 ---
 mongo_user: mongo
-mongo_group: nanocore
+mongo_group: "{{ inf_group }}"
 mongod_port: 27017
 mongod_repl_set: ""

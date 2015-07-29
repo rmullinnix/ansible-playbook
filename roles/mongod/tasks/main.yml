@@ -41,22 +41,22 @@
     template: src=bs_mongod.tmpl dest=/tmp/bs_mongod.tmpl
 
   - name: Run bootstrap process
-    command: /tmp/bootstrap -conf=/tmp/bs_mongod.conf -tmpl=/tmp/bs_mongod.tmpl
+    command: /tmp/bootstrap -conf=/tmp/bs_mongod.conf -tmpl=/tmp/bs_mongod.tmpl -port={{ consul_port }}
     run_once: true
 
   - name: Add mongod status utility
     template: src="mongod_status.sh" dest="{{ inf_app_path }}/mongo/mongo_status.sh" mode=755
 
   - name: Add consul-template ctmpl file
-    copy: src=mongod.{{ mongod_deploy }}.ctmpl dest=/etc/consul-template/ctmpl/mongod.ctmpl
+    copy: src=mongod.{{ mongod_deploy }}.ctmpl dest={{ etc_conf}}/consul-template/ctmpl/mongod.ctmpl
     notify: refresh consultemplate
 
   - name: Add file consul-template conf
-    template: src=consul-template.conf dest=/etc/consul-template/conf.d/mongod mode=744
+    template: src=consul-template.conf dest={{ etc_conf }}/consul-template/conf.d/mongod mode=744
     notify: refresh consultemplate
 
   - name: Add file consul service config
-    template: src=mongod.json dest=/etc/consul.d/mongod.json mode=744
+    template: src=mongod.json dest={{ etc_conf }}/consul.d/mongod.json mode=744
     notify: refresh consul
 
   - name: Install mongo init script

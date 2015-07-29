@@ -19,14 +19,15 @@
 # Short-Description: Manage the consul-template agent
 # Description: Consul-template is a tool sync the consul registry with a template file
 ### END INIT INFO
+
 . /etc/rc.status
 rc_reset
  
 prog="consul-template"
 user="root"
 exec="{{ inf_app_path }}/$prog/$prog"
-pidfile="/var/run/$prog.pid"
-lockfile="/var/lock/subsys/$prog"
+pidfile="{{ pid_path }}/$prog.pid"
+lockfile="{{ lock_path }}/subsys/$prog"
 logfile="{{ inf_log_path }}/$prog.log"
 confdir="{{ consul_template_config_dir }}"
  

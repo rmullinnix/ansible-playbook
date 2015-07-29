@@ -14,6 +14,3 @@ processManagement:
    pidFilePath: "/var/run/mongodb/mongod.pid"
 net:
    port: {{ key "software/mongod/conf/net/port" }}
-security:
-   keyFile: {{ key "software/mongod/conf/security/keyFile" }}
-   clusterAuthMode: "keyFile"

@@ -1,3 +1,3 @@
 ---
 elasticsearch_user: nanolog
-elasticsearch_group: nanocore
+elasticsearch_group: "{{ inf_group }}"

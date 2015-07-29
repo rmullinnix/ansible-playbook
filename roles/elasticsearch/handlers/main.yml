@@ -1,7 +1,7 @@
 ---
 # file: roles/elasticsearch/handlers/main.yml
 - name: install elasticsearch
-  command: /sbin/insserv -f elasticsearch
+  command: /sbin/insserv -f elasticsearch{{ init_suffix }}
 
 - name: restart elasticsearch
-  service: name=elasticsearch state=restarted
+  service: name=elasticsearch{{ init_suffix }} state=restarted

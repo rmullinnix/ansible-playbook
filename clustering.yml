@@ -8,12 +8,14 @@
   become: yes
 
   roles:
+    - role: common
     - role: consul
 
 - hosts: consulagents
   become: yes
 
   roles:
+    - role: common
     - role: consul
 
 # setup and deploy consul-template
@@ -21,4 +23,5 @@
   become: yes
 
   roles:
+    - role: common
     - role: consul-template

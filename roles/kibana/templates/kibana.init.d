@@ -26,7 +26,7 @@ prog="kibana"
 user="{{ kibana_user }}"
 group="{{ kibana_group }}"
 exec="{{ inf_app_path }}/kibana/current/bin/$prog"
-pidfile="/var/run/$prog.pid"
+pidfile="{{ pid_path }}/$prog.pid"
 logfile="{{ inf_log_path }}/$prog.log"
 confdir="{{ inf_app_path }}/kibana/current/config"
  

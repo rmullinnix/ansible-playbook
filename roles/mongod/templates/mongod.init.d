@@ -21,11 +21,11 @@ rc_reset
 
 # NOTE: if you change any OPTIONS here, you get what you pay for:
 # this script assumes all options are in the config file.
-CONFIGFILE="/etc/mongod.conf"
+CONFIGFILE="{{ etc_conf }}/mongod.conf"
 OPTIONS=" -f $CONFIGFILE"
 SYSCONFIG="/etc/sysconfig/mongod"
 
-PIDDIR="/var/run/mongodb"
+PIDDIR="{{ pid_path }}/mongodb"
 PIDFILEPATH=`awk -F'[:=]' -v IGNORECASE=1 '/^[[:blank:]]*(processManagement\.)?pidfilepath[[:blank:]]*[:=][[:blank:]]*/{print $2}' "$CONFIGFILE" | tr -d "[:blank:]\"'"`
 
 mongod={{ inf_app_path}}/mongo/mongod
@@ -57,6 +57,7 @@ start()
 
   umask 033
   touch $PIDFILEPATH
+  chown $MONGO_USER:$MONGO_GROUP $PIDFILEPATH
 
   # Recommended ulimit values for mongod or mongos
   # See http://docs.mongodb.org/manual/reference/ulimit/#recommended-settings
@@ -72,7 +73,7 @@ start()
   $NUMACTL /sbin/start_daemon -u "$MONGO_USER" -p "$PIDFILEPATH" $mongod $OPTIONS >/dev/null 2>&1
 
   RETVAL=$?
-  [ $RETVAL -eq 0 ] && touch /var/lock/subsys/mongod && chmod 644 $PIDFILEPATH
+  [ $RETVAL -eq 0 ] && touch {{ lock_path }}/subsys/mongod && chmod 644 $PIDFILEPATH
   return $RETVAL
 }
 
@@ -81,7 +82,7 @@ stop()
   echo -n "Stopping mongod: "
   mongo_killproc "$PIDFILEPATH" $mongod
   RETVAL=$?
-  [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/mongod
+  [ $RETVAL -eq 0 ] && rm -f {{ lock_path }}/subsys/mongod
   return $RETVAL
 }
 
@@ -138,7 +139,7 @@ case "$1" in
     rc_status -v
     ;;
   condrestart)
-    [ -f /var/lock/subsys/mongod ] && restart || :
+    [ -f {{ lock_path }}/subsys/mongod ] && restart || :
     rc_status
     ;;
   status)
