@@ -54,5 +54,5 @@
     notify: refresh consul
 
   - name: Copy ssl template
-    template: src=logstash.cnf dest=/etc/ssl/logstash.cnf
+    template: src=logstash.cnf dest=/etc/ssl/logstash-{{ ansible_environment }}.cnf
     notify: generate lscert
