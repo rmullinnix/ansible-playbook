@@ -4,7 +4,7 @@
     with_items:
       - "{{ consul_template_ctmpl_dir }}"
       - "{{ consul_template_config_dir }}"
-      - "{{ inf_app_path }}/consul-template/bin"
+      - "{{ inf_app_path }}/consul-template"
 
   - name: Process templates init.d
     template: src=consul-template.init.d dest=/etc/init.d/consul-template{{ init_suffix }} mode=744

@@ -7,4 +7,4 @@
   service: name=consul{{ init_suffix }} state=restarted
 
 - name: refresh consul
-  shell: 'kill -1 $(cat {{ pid_path }}/consul.pid)'
+  service: name=consul{{ init_suffix }} state=reloaded

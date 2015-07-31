@@ -5,6 +5,7 @@
       - "{{ etc_conf }}"
       - "{{ pid_path }}"
       - "{{ lock_path }}"
+      - "{{ lock_path }}/subsys"
       - "{{ inf_app_path }}"
       - "{{ inf_log_path }}"
       - "{{ inf_data_path }}"

@@ -87,8 +87,9 @@ restart() {
  
 reload() {
     echo -n $"Reloading $prog: "
-    /sbin/start-stop-daemon -K -p $pidfile -u $user -x $exec -s 9
-    echo
+    /sbin/start-stop-daemon -K -p $pidfile -u $user -x $exec -s 1
+    RETVAL=$?
+    return $RETVAL
 }
  
 force_reload() {
@@ -108,15 +109,19 @@ rh_status_q() {
 case "$1" in
     start)
         $1
+	rc_status -v
         ;;
     stop)
         $1
+	rc_status -v
         ;;
     restart)
         $1
+	rc_status -v
         ;;
     reload)
         $1
+	rc_status -v
         ;;
     force-reload)
         force_reload
@@ -129,4 +134,4 @@ case "$1" in
         exit 2
 esac
  
-exit $?
+rc_exit

@@ -25,20 +25,19 @@
 
   - name: Run bootstrap process
     command: /tmp/bootstrap -conf=/tmp/bs_logstash.conf -tmpl=/tmp/bs_logstash.tmpl -port={{ consul_port }}
+    run_once: true
 
   - name: Add consul-template ctmpl files
     copy: src="{{ item.src }}" dest="{{ item.dest }}"
     with_items:
       - { src: "01-lumberjack-input.ctmpl", dest: "{{ etc_conf }}/consul-template/ctmpl/01-lumberjack-input.ctmpl" }
       - { src: "90-lumberjack-output.ctmpl", dest: "{{ etc_conf }}/consul-template/ctmpl/90-lumberjack-output.ctmpl" }
-    notify: refresh consultemplate
 
   - name: Convert templates (logstash-input, logstash-output)
     template: src={{ item.src }} dest={{ item.dest }} mode=744 owner={{ logstash_user }}
     with_items:
       - { src: "consul-template.input.conf", dest: "{{ etc_conf }}/consul-template/conf.d/logstash-input" }
       - { src: "consul-template.output.conf", dest: "{{ etc_conf }}/consul-template/conf.d/logstash-output" }
-    notify: refresh consultemplate
 
   - name: Add status utility
     template: src="/usr/nano/build/{{ ansible_environment }}/status-utils/logstash_status.sh" dest="{{ inf_app_path }}/logstash/current/bin/logstash_status.sh" mode=755
@@ -51,7 +50,6 @@
 
   - name: Convert template consul json
     template: src=logstash.json dest={{ etc_conf }}/consul.d/logstash.json mode=744
-    notify: refresh consul
 
   - name: Copy ssl template
     template: src=logstash.cnf dest=/etc/ssl/logstash-{{ ansible_environment }}.cnf

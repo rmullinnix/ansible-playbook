@@ -1,0 +1,22 @@
+---
+# This Playbook bounces a consul cluster that is unable to elect a leader
+
+# push peers.json to the consul/raft data directory, change single quotes to doubles, restart consul servers
+- hosts: consulservers
+  become: yes
+
+# update the peers.json file with the correct consul server ip addresses and port
+  tasks:
+    - include_vars: roles/consul/vars/main.yml
+
+    - name: Create peers.json file
+      template: src=roles/consul/templates/peers.json dest={{ inf_data_path }}/consul/raft/peers.json owner={{ consul_user }}
+
+    - name: Copy sedfile
+      copy: src=roles/consul/files/sedfile dest=/tmp/sedfile
+
+    - name: Correct quotes
+      shell: sed -i -f /tmp/sedfile {{ inf_data_path }}/consul/raft/peers.json
+
+    - name: restart consul server
+      service: name=consul{{ init_suffix }} state=restarted

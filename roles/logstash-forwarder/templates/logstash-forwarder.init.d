@@ -1,47 +1,37 @@
 #!/bin/bash
 #
-# consul        Manage the consul agent
+# logstash-forwarder        Centralized log collection
 #       
 # chkconfig:   2345 95 95
-# description: Consul is a tool for service discovery and configuration
-# processname: consul
-# config: /etc/sysconfig/consul.d
-# pidfile: /var/run/consul.pid
+# description: logstash-forwarder listens for new log entries and forwards to logstash
+# processname: logstash-forwarder
+# config: /etc/logstash-forwarder/conf.d
+# pidfile: /var/run/logstash-forwarder.pid
  
 ### BEGIN INIT INFO
-# Provides:       consul
+# Provides:       logstash-forwarder
 # Required-Start: $local_fs $network
 # Required-Stop:
 # Should-Start:
 # Should-Stop:
 # Default-Start: 2 3 4 5
 # Default-Stop:  0 1 6
-# Short-Description: Manage the consul agent
-# Description: Consul is a tool for service discovery and configuration
+# Short-Description: Manage the logstash-forwarder daemon
+# Description: logstash-forwarder listens for new log entries and forwards to logstash
 ### END INIT INFO
 . /etc/rc.status
 rc_reset
  
-prog="consul"
-user="{{ consul_user }}"
-group="{{ consul_group }}"
-exec="{{ consul_app_path }}/bin/$prog"
+prog="logstash-forwarder"
+exec="{{ inf_app_path}}/logstash-forwarder/$prog"
 pidfile="{{ pid_path }}/$prog.pid"
 lockfile="{{ lock_path }}/subsys/$prog"
-logfile="{{ consul_log_dir}}/$prog"
-conffile="{{ etc_conf }}/consul.conf"
-confdir="{{ etc_conf }}/consul.d"
-uidir="{{ apache_doc_root }}/consului"
- 
-# pull in sysconfig settings
-[ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
- 
-export GOMAXPROCS=${GOMAXPROCS:-2}
+logfile="{{ inf_log_path }}/$prog.log"
+confdir="{{ etc_conf }}/logstash-forwarder/conf.d"
  
 start() {
     [ -x $exec ] || exit 5
     
-    [ -f $conffile ] || exit 6
     [ -d $confdir ] || exit 6
  
     umask 033
@@ -51,7 +41,7 @@ start() {
  
     ulimit -v unlimited
 
-    echo -n $"Starting $prog: $1"
+    echo -n $"Starting $prog"
 
     ## holy shell shenanigans, batman!
     ## daemon can't be backgrounded.  we need the pid of the spawned process,
@@ -59,8 +49,7 @@ start() {
     ## &; action" but you can do "{cmd &}; action".
     /sbin/start_daemon -f \
         -p $pidfile \
-        -u $user \
-		$exec agent -config-file=$conffile -config-dir=$confdir -ui-dir=$uidir 2>&1 >> $logfile & echo $! > $pidfile
+		$exec --config=$confdir >> $logfile 2>&1 & echo $! > $pidfile
     
     RETVAL=$?
     echo
@@ -73,7 +62,7 @@ start() {
 stop() {
     echo -n $"Shutting down $prog: "
     ## graceful shutdown with SIGINT
-    /sbin/start-stop-daemon -K -p $pidfile -u $user -x $exec -s 2
+    /sbin/start-stop-daemon -K -p $pidfile
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && rm -f $lockfile
@@ -82,15 +71,13 @@ stop() {
  
 restart() {
     stop
-    sleep 4
     start
 }
  
 reload() {
     echo -n $"Reloading $prog: "
-    /sbin/start-stop-daemon -K -p $pidfile -u $user -x $exec -s 1
-    RETVAL=$?
-    return $RETVAL
+    /sbin/start-stop-daemon -K -p $pidfile -u $user -x $exec -s 9
+    echo
 }
  
 force_reload() {
@@ -99,7 +86,7 @@ force_reload() {
  
 rh_status() {
     checkproc -p $pidfile $exec
-    $exec version
+    $exec --version
     rc_status -v
 }
  
@@ -110,19 +97,18 @@ rh_status_q() {
 case "$1" in
     start)
         $1
-	rc_status -v
         ;;
     stop)
         $1
-	rc_status -v
         ;;
     restart)
         $1
-	rc_status -v
         ;;
     reload)
         $1
-	rc_status -v
+        ;;
+    bootstrap)
+        start $1
         ;;
     force-reload)
         force_reload
@@ -131,8 +117,8 @@ case "$1" in
         rh_status
         ;;
     *)
-        echo $"Usage: $0 {start|stop|status|restart|reload|force-reload}"
+        echo $"Usage: $0 {start|stop|status|restart|bootstrap|reload|force-reload}"
         exit 2
 esac
  
-rc_exit
+exit $?

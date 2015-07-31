@@ -49,15 +49,12 @@
 
   - name: Add consul-template ctmpl file
     copy: src=mongod.{{ mongod_deploy }}.ctmpl dest={{ etc_conf}}/consul-template/ctmpl/mongod.ctmpl
-    notify: refresh consultemplate
 
   - name: Add file consul-template conf
     template: src=consul-template.conf dest={{ etc_conf }}/consul-template/conf.d/mongod mode=744
-    notify: refresh consultemplate
 
   - name: Add file consul service config
     template: src=mongod.json dest={{ etc_conf }}/consul.d/mongod.json mode=744
-    notify: refresh consul
 
   - name: Install mongo init script
     template: src=mongod.init.d mode=744 dest=/etc/init.d/mongod

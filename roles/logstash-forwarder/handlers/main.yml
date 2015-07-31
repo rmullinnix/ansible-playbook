@@ -1,0 +1,7 @@
+---
+# file: roles/logstash-forwarder/handlers/main.yml
+- name: install logstash-forwarder
+  command: /sbin/insserv -f logstash-forwarder{{ init_suffix }}
+
+- name: restart logstash-forwarder
+  service: name=logstash-forwarder{{ init_suffix }} state=restarted

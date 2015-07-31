@@ -15,36 +15,23 @@
   - name: Copy and extract kibana
     unarchive: src="/usr/nano/build/{{ ansible_environment }}/kibana/kibana.tar.gz" dest="{{ inf_app_path }}/kibana" owner={{ kibana_user }} group={{ inf_group }}
 
-  - name: Add bootstrap program and config
-    copy: src="{{ item.src }}" dest={{ item.dest }} mode=777
-    with_items:
-      - { src: "/usr/nano/build/{{ ansible_environment }}/bootstrap/bootstrap", dest: "/tmp/bootstrap" }
-      - { src: "bs_kibana.conf", dest: "/tmp/bs_kibana.conf" }
-
-  - name: Add bootstrap tmpl file
-    template: src=bs_kibana.tmpl dest=/tmp/bs_kibana.tmpl
-
-  - name: Run bootstrap process
-    command: /tmp/bootstrap -conf=/tmp/bs_kibana.conf -tmpl=/tmp/bs_kibana.tmpl -port={{ consul_port }}
-
   - name: Add consul-template ctmpl file
-    copy: src=kibana.ctmpl dest={{ etc_conf }}/consul-template/ctmpl/kibana.ctmpl
-    notify: refresh consultemplate
+    template: src=kibana.ctmpl dest={{ etc_conf }}/consul-template/ctmpl/kibana.ctmpl
 
   - name: Add status utility
     copy: src="/usr/nano/build/{{ ansible_environment }}/status-utils/kibana_status" dest="{{ inf_app_path }}/kibana/current/bin/kibana_status" mode=755
 
   - name: Convert template init.d
     template: src=kibana.init.d dest=/etc/init.d/kibana{{ init_suffix }} mode=744
-    notify: install kibana
+    notify: 
+      - install kibana
+      - restart kibana
 
   - name: Convert template consul-template
     template: src=consul-template.conf dest={{ etc_conf }}/consul-template/conf.d/kibana mode=744
-    notify: refresh consultemplate
 
   - name: Convert template consul-template
     template: src=kibana.json dest={{ etc_conf }}/consul.d/kibana.json mode=744
-    notify: refresh consul
 
   - name: Add apache mod_proxy to connect to consul
     lineinfile: dest="{{ inf_app_path }}/apache2/conf/httpd.conf" regexp={{ item.regex }} insertafter="^#ProxyPass" line={{ item.line }}

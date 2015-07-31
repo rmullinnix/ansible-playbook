@@ -1,0 +1,7 @@
+{
+  "network": {
+    "servers": [ {% raw %}{{range services}}{{if .Name | regexMatch "^logstash"}}{{range service .Name}}"{{.Address}}:{{.Port}}"{{end}}{{end}}{{end}}{% endraw %} ],
+    "timeout": 15,
+    "ssl ca": "/etc/ssl/certs/logstash-forwarder-{{ ansible_environment }}.crt"
+  }
+}

@@ -17,7 +17,7 @@
 
   post_tasks:
     - name: refresh consul
-      shell: 'kill -1 $(cat /var/run/consul.pid)'
+      service: name=consul{{ init_suffix }} state=reloaded
 
     - name: refresh consul-template
-      shell: 'kill -1 $(cat /var/run/consul-template.pid)'
+      service: name=consul-template{{ init_suffix }} state=reloaded

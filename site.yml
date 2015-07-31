@@ -4,6 +4,6 @@
 #   as well as the UI components for consul and Kibana
 
 - include: clustering.yml
-- include: webservers.yml
 - include: logging.yml
+- include: webservers.yml
 - include: dbservers.yml

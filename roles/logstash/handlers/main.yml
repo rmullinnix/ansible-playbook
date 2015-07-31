@@ -7,7 +7,7 @@
   service: name=logstash{{ init_suffix }} state=restarted
 
 - name: generate lscert
-  command: openssl req -config /etc/ssl/logstash-{{ ansible-environment }}.cnf -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout {{ inf_app_path }}/logstash/current/logstash-forwarder.key -out /etc/ssl/certs/logstash-forwarder-{{ ansible_environment }}.crt
+  shell: "openssl req -config /etc/ssl/logstash-{{ ansible_environment }}.cnf -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout {{ inf_app_path }}/logstash/current/logstash-forwarder.key -out /etc/ssl/certs/logstash-forwarder-{{ ansible_environment }}.crt"
   notify: generate lscert2
 
 - name: generate lscert2

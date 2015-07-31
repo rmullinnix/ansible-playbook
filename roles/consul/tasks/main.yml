@@ -5,28 +5,6 @@
   - name: Create consul user
     user: name="{{ consul_user }}" comment="Consul dameon account" group="{{ consul_group }}"
 
-  - name: Create Consul Agent config
-    template: src=consulagent.conf dest={{ etc_conf }}/consul.conf owner="{{ consul_user }}" group="{{ consul_group }}" mode=744
-    when: "'consulagents' in group_names"
-    notify: refresh consul
-
-  - name: Create Consul Server config
-    template: src=consulserver.conf dest={{ etc_conf }}/consul.conf owner="{{ consul_user }}" group="{{ consul_group }}" mode=744
-    when: "'consulservers' in group_names"
-    notify: refresh consul
-
-  - name: Create Consul bin, config, data, and log directories
-    file: path={{ item }} state=directory owner={{ consul_user }} group={{ consul_group }} mode=755
-    with_items:
-      - "{{ consul_app_path}}/bin"
-      - "{{ consul_config_dir }}"
-      - "{{ consul_data_dir }}"
-      - "{{ consul_log_dir }}"
-
-  - name: Copy consul executable
-    copy: src=/usr/nano/build/{{ ansible_environment }}/consul/bin/consul dest={{ consul_app_path }}/bin/consul owner="{{ consul_user }}" group="{{ consul_group }}" mode=744
-    notify: restart consul
-
   - name: Install consul init.d script
     template: src=consul.init.d mode=744 dest=/etc/init.d/consul{{ init_suffix }}
     when: "'consului' not in group_names"
@@ -40,3 +18,26 @@
     notify: 
       - install consul
       - restart consul
+
+
+  - name: Create Consul bin, config, data, and log directories
+    file: path={{ item }} state=directory owner={{ consul_user }} group={{ consul_group }} mode=755
+    with_items:
+      - "{{ consul_app_path }}/bin"
+      - "{{ consul_config_dir }}"
+      - "{{ consul_data_dir }}"
+      - "{{ consul_log_dir }}"
+
+  - name: Copy consul executable
+    copy: src=/usr/nano/build/{{ ansible_environment }}/consul/bin/consul dest={{ consul_app_path }}/bin/consul owner="{{ consul_user }}" group="{{ consul_group }}" mode=744
+    notify: restart consul
+
+  - name: Create Consul Agent config
+    template: src=consulagent.conf dest={{ etc_conf }}/consul.conf owner="{{ consul_user }}" group="{{ consul_group }}" mode=744
+    when: "'consulagents' in group_names"
+    notify: refresh consul
+
+  - name: Create Consul Server config
+    template: src=consulserver.conf dest={{ etc_conf }}/consul.conf owner="{{ consul_user }}" group="{{ consul_group }}" mode=744
+    when: "'consulservers' in group_names"
+    notify: refresh consul

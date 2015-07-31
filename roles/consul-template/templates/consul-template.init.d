@@ -82,7 +82,7 @@ restart() {
  
 reload() {
     echo -n $"Reloading $prog: "
-    /sbin/start-stop-daemon -K -p $pidfile -u $user -x $exec -s 9
+    /sbin/start-stop-daemon -K -p $pidfile -u $user -x $exec -s 1
     echo
 }
  

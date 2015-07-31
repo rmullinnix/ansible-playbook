@@ -1,0 +1,42 @@
+---
+# This Playbook deploys the consul componets for consul server,
+#   consul agent, and consul-template
+#   consului is deployed with the webservers group
+
+# setup and deploy consul servers and consul agents
+- hosts: consulservers
+  become: yes
+  serial: 1
+
+# these are the tasks to run before applying updates
+  pre_tasks:
+    - name: Stop consul instance
+      service: name=consul{{ init_suffix }} state=stopped
+
+    - name: Wait for consul to close ports
+      wait_for: port={{ consul_port }} state=stopped
+
+  roles:
+    - consul
+
+  post_tasks:
+    - name: Start consul instance
+      service: name=consul{{ init_suffix }} state=restarted
+
+    - name: Ensure consul port is active and listening
+      wait_for: port={{ consul_port }} state=started
+
+- hosts: consulagents
+  become: yes
+  serial: 1
+
+  roles:
+    - consul
+
+# setup and deploy consul-template
+#- hosts: consultemplate
+#  become: yes
+
+#  roles:
+#    - role: common
+#    - role: consul-template

@@ -30,9 +30,11 @@
       - install apache
       - restart apache
 
-  - name: Create consul json file
-    template: src=apache2.json dest={{ etc_conf }}/consul.d/apache2.json mode=744
-    notify: refresh consul
-
   - name: Copy apache status utility
     copy: src="/usr/nano/build/{{ ansible_environment }}/status-utils/apache_status" dest="{{ inf_app_path }}/apache2/bin/apache_status" mode=755 owner="{{ apache_user }}" group="{{ apache_group }}"
+
+  - name: Create consul json file
+    template: src=apache2.json dest={{ etc_conf }}/consul.d/apache2.json mode=644
+
+  - name: Create logstash-forwarder config file
+    template: src=logstash-forwarder.conf dest={{ etc_conf }}/logstash-forwarder/conf.d/10-apache.conf mode=644

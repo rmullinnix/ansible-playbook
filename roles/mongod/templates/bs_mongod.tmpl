@@ -3,35 +3,43 @@
 		"mongod": {
 			"software/mongod/conf/systemLog/path": {
 				"value": "{{ db_log_path }}/mongod.log",
-				"encrypt": false
+				"encrypt": false,
+				"state": "present"
 			},
 			"software/mongod/conf/systemLog/verbosity": {
 				"value": "0",
-				"encrypt": false
+				"encrypt": false,
+				"state": "present"
 			},
 			"software/mongod/conf/systemLog/quiet": {
 				"value": "true",
-				"encrypt": false
+				"encrypt": false,
+				"state": "present"
 			},
 			"software/mongod/conf/systemLog/traceAllException": {
 				"value": "false",
-				"encrypt": false
+				"encrypt": false,
+				"state": "present"
 			},
 			"software/mongod/conf/storage/dbPath": {
 				"value": "{{ db_data_path }}/mongo/mongod",
-				"encrypt": false
+				"encrypt": false,
+				"state": "present"
 			},
 			"software/mongod/conf/net/port": {
 				"value": "{{ mongod_port }}",
-				"encrypt": false
+				"encrypt": false,
+				"state": "present"
 			},
 			"software/mongod/conf/replication/replSetName": {
 				"value": "{{ mongod_repl_set }}",
-				"encrypt": false
+				"encrypt": false,
+				"state": "present"
 			},
 			"software/mongod/conf/security/keyFile": {
 				"value": "{{ inf_app_path }}/mongo/mongodb-keyfile",
-				"encrypt": false
+				"encrypt": false,
+				"state": "present"
 			}
 		}
 	}

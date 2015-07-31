@@ -1,4 +1,5 @@
 ---
+
 # This Playbook deploys elasticsearch and logstash
 
 # deploy elasticsearch
@@ -15,6 +16,9 @@
   roles:
     - role: logstash
 
-  handlers:
-    - include: roles/consul/handlers/main.yml
-    - include: roles/consul-template/handlers/main.yml
+  post_tasks:
+    - name: refresh consul
+      service: name=consul{{ init_suffix }} state=reloaded
+
+    - name: refresh consul-template
+      service: name=consul-template{{ init_suffix }} state=reloaded
