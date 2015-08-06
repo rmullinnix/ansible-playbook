@@ -17,5 +17,6 @@ net:
 replication:
    replSetName: {{ key "software/mongod/conf/replication/replSetName" }}
 security:
-   keyFile: {{ key "software/mongod/conf/security/keyFile" }}
+   keyFile: "{{ key "software/mongod/conf/security/keyFile" }}"
    clusterAuthMode: "keyFile"
+   authorization: "enabled"

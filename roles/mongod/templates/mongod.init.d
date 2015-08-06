@@ -1,7 +1,5 @@
 #!/bin/bash
-
 # mongod - Startup script for mongod
-
 ### BEGIN INIT INFO
 # Provides:       mongod
 # Required-Start: $network

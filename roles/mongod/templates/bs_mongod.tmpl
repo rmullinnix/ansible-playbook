@@ -32,7 +32,7 @@
 				"state": "present"
 			},
 			"software/mongod/conf/replication/replSetName": {
-				"value": "{{ mongod_repl_set }}",
+				"value": "repl0{{ ansible_environment }}",
 				"encrypt": false,
 				"state": "present"
 			},

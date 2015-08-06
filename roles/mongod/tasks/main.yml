@@ -31,6 +31,9 @@
   - name: Install Mongo executables
     unarchive: src=/usr/nano/build/{{ ansible_environment }}/mongo/mongo-ent.tar.gz dest={{ inf_app_path }}/mongo owner={{ mongo_user }} group={{ mongo_group }}
 
+  - name: Copy keyfile for cluster
+    copy: src=/usr/nano/build/{{ ansible_environment }}/mongo/keyfile dest={{ inf_app_path }}/mongo/mongodb-keyfile owner={{ mongo_user }} group={{ mongo_group }} mode=400
+
   - name: Add bootstrap program and config
     copy: src="{{ item.src }}" dest={{ item.dest }} mode=777
     with_items:
@@ -60,4 +63,4 @@
     template: src=mongod.init.d mode=744 dest=/etc/init.d/mongod
     notify:
       - install mongod
-      - retart mongod
+      - restart mongod
