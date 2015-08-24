@@ -16,9 +16,9 @@ msp0lnanm002.etdbw.com
 msp0lnanm002.etdbw.com
 
 [dbservers]
-msp0lmngm001.etdbw.com
-msp0lmngm002.etdbw.com
-msp0lmngm003.etdbw.com
+msp0lmngm001.etdbw.com mongo_role=primary
+msp0lmngm002.etdbw.com mongo_role=secondary
+msp0lmngm003.etdbw.com mongo_role=secondary
 
 [elasticsearch]
 msp0lnanm001.etdbw.com

@@ -1,0 +1,48 @@
+---
+  - name: Ensure group is present
+    group: name="{{ inf_group }}" state=present
+
+  - name: Create user to be used by dameon processes
+    user: name="{{ mms_user }}" comment="mongodb mms" group="{{ inf_group }}"
+
+  - name: Create directory structure (app, log, data)
+    file: path={{ item }} state=directory group={{ inf_group }} owner={{ mms_user }}
+    with_items:
+      - "{{ inf_app_path }}/mongo"
+      - "{{ inf_log_path }}/mongo/mms"
+
+  - name: Copy and extract mongodb mms
+    unarchive: src="/usr/nano/build/{{ ansible_environment }}/mongo/mongo-mms.tar.gz" dest="{{ inf_app_path }}/mongo" owner={{ mms_user }} group={{ inf_group }}
+
+  - name: Add configuration files
+    template: src={{ item }} dest={{ inf_app_path }}/mongo/mms/conf/{{ item }} mode=644 owner={{ mms_user }}
+    with_items:
+      - "conf-mms.properties"
+      - "mms.conf"
+    notify: 
+      - install mongodb-mms
+      - restart mongodb-mms
+
+  - name: Add status utilities
+    template: src="mms_status.sh" dest="{{ inf_app_path }}/mongo/mms/bin/mms_status.sh" mode=755 owner={{ mms_user }}
+
+  - name: Add status utilities
+    template: src="mms_backup_status.sh" dest="{{ inf_app_path }}/mongo/mms/bin/mms_backup_status.sh" mode=755
+
+  - name: Convert template init.d for mms
+    template: src=mongodb-mms.init.d dest=/etc/init.d/mongodb-mms mode=744
+    notify: 
+      - install mongodb-mms
+      - restart mongodb-mms
+
+  - name: Convert init.d template for backup
+    template: src=mongodb-backup-http.init.d dest=/etc/init.d/mongodb-backup-http mode=744
+    notify:
+      - install mongodb-mms
+      - restart mongodb-mms
+
+  - name: Convert template consul registration for mms
+    template: src=mongodb-mms.json dest={{ etc_conf }}/consul.d/mongodb-mms.json mode=744
+
+  - name: Convert template consul registration for backup
+    template: src=mongodb-backup.json dest={{ etc_conf }}/consul.d/mongodb-backup.json mode=744

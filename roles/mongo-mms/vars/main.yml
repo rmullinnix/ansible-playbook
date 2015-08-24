@@ -1,0 +1,13 @@
+---
+mms_host: "{% for host in groups['webops'] %}{{ host }}{% endfor %}"
+mongodb_hosts: "{% for host in groups['dbservers'] %}{{ host }}:27017{% if not loop.last %},{% endif %} {% endfor %}"
+mms_port: 8180
+mms_ssl_port: 8443
+mms_backup_port: 8181
+mms_backup_ssl_port: 8444
+mms_bounce_email: nandhu.sriram@assurant.com
+mms_from_email: mongo{{ ansible_environment}}server@assurant.com
+mms_reply_to_email: nandhu.sriram@assurant.com
+mms_admin_from_email: mongoadmin@assurant.com
+mms_admin_email: nandhu.sriram@assurant.com
+mms_user: mongodb-mms

@@ -1,0 +1,19 @@
+---
+# This Playbook sets up the users on the dev cluster to be able to deploye
+
+- hosts: all
+  become: yes
+
+  tasks:
+    - name: Create user
+      user: 'name="ansible-{{ ansible_environment }}" comment="Ansible deployment account"'
+
+    - name: Add sudo privilages with no password challenge
+      lineinfile: "dest=/etc/sudoers state=present regexp='^ansible' line='ansible-{{ ansible_environment }} ALL=(ALL) NOPASSWD: ALL'"
+
+- hosts: all
+  become_user: ansible-dev
+
+  tasks:
+    - name: copy ssh key
+      local_action: command ssh-copy-id ansible-{{ansible_environment }}@{{ inventory_hostname }}

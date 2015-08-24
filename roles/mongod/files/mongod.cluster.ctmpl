@@ -9,6 +9,8 @@ storage:
    journal:
       enabled: true
    dbPath: {{ key "software/mongod/conf/storage/dbPath" }}
+   directoryPerDB: {{ key "software/mongod/conf/storage/directoryPerDB" }}
+   engine: {{ key "software/mongod/conf/storage/engine" }}
 processManagement:
    fork: true
    pidFilePath: "/var/run/mongodb/mongod.pid"

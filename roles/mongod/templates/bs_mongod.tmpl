@@ -21,6 +21,16 @@
 				"encrypt": false,
 				"state": "present"
 			},
+			"software/mongod/conf/storage/directoryPerDB": {
+				"value": "true",
+				"encrypt": false,
+				"state": "present"
+			},
+			"software/mongod/conf/storage/engine": {
+				"value": "{{ mongod_engine }}",
+				"encrypt": false,
+				"state": "present"
+			},
 			"software/mongod/conf/storage/dbPath": {
 				"value": "{{ db_data_path }}/mongo/mongod",
 				"encrypt": false,

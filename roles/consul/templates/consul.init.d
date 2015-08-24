@@ -9,7 +9,7 @@
 # pidfile: /var/run/consul.pid
  
 ### BEGIN INIT INFO
-# Provides:       consul-{{ ansible-environment }}
+# Provides:       consul-{{ init_suffix }}
 # Required-Start: $local_fs $network
 # Required-Stop:
 # Should-Start:

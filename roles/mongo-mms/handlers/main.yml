@@ -1,0 +1,13 @@
+---
+# file: roles/mongo-mms/handlers/main.yml
+- name: install mongodb-mms
+  command: /sbin/insserv -f {{ item }}
+  with_items:
+    - "mongodb-mms"
+    - "mongodb-backup-http"
+
+- name: restart mongodb-mms
+  service: name={{ item }} state=restarted
+  with_items:
+    - "mongodb-mms"
+    - "mongodb-backup-http"

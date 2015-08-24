@@ -3,3 +3,4 @@ mongo_user: mongo
 mongo_group: "{{ inf_group }}"
 mongod_port: 27017
 mongod_repl_set: ""
+mongod_engine: "wiredTiger"

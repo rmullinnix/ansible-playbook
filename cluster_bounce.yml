@@ -18,5 +18,5 @@
     - name: Correct quotes
       shell: sed -i -f /tmp/sedfile {{ inf_data_path }}/consul/raft/peers.json
 
-    - name: restart consul server
-      service: name=consul{{ init_suffix }} state=restarted
+#    - name: restart consul server
+#      service: name=consul{{ init_suffix }} state=restarted

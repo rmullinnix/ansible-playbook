@@ -1,0 +1,35 @@
+[consulagents]
+msp0lnans[004:006].etdbw.com
+
+[consulservers]
+msp0lnans[001:003].etdbw.com
+
+[consultemplate]
+msp0lnans002.etdbw.com
+msp0lnans003.etdbw.com
+msp0lnans005.etdbw.com
+
+[dbservers]
+msp0lnans002.etdbw.com mongo_role=primary
+msp0lnans003.etdbw.com mongo_role=secondary
+msp0lnans005.etdbw.com mongo_role=secondary
+
+[webops]
+msp0lnand002.etdbw.com
+
+[consului]
+msp0lnans001.etdbw.com
+
+[backupdaemon]
+msp0lnans005.etdbw.com
+
+[opsagents]
+msp0lnans002.etdbw.com
+
+[operations:children]
+backupdaemon
+consulagents
+consulservers
+dbservers
+opsagents
+webops

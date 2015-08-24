@@ -2,7 +2,7 @@
 # This Playbook deploys mongodb
 
 # deploy mongo
-- hosts: dbservers
+- hosts: opsdatabse
   become: yes
 
   roles:

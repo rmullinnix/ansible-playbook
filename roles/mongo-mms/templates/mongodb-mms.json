@@ -1,0 +1,11 @@
+{
+    "service": {
+        "name": "mongodb-mms",
+        "tags": ["operations"],
+        "port": {{ mms_backup_port }},
+        "check": {
+            "script": "{{ inf_app_path }}/mongo/mms/mms_backup_status.sh",
+            "interval": "300s"
+        }
+    }
+}

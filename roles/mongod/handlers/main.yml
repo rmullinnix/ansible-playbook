@@ -1,25 +1,23 @@
 ---
 # file: roles/mongod/handlers/main.yml
-- name: install mongod
-  command: /sbin/insserv -f mongod
+#- name: install mongod
+#  command: /sbin/insserv -f mongod
 
-- name: restart mongod
-  service: name=mongod state=restarted
-  notify: init repl_set
+#- name: restart mongod
+#  service: name=mongod state=restarted
+#  notify: init repl_set
 
-- name: init repl_set
-  template: src={{ item.src }} dest={{ item.dest }}
-  when: mongod_deploy == "cluster"
-  run_once: true
-  with_items:
-   - { src: "user_init.js", dest: "/tmp/user_init.js" }
-   - { src: "replset_init.js", dest: "/tmp/replset_init.js" }
-  notify: init repl_set2
+#- name: init repl_set
+#  template: src={{ item.src }} dest={{ item.dest }}
+#  when: mongod_deploy == "cluster"
+#  with_items:
+#   - { src: "user_init.js", dest: "/tmp/user_init.js" }
+#   - { src: "replset_init.js", dest: "/tmp/replset_init.js" }
+#  notify: init repl_set2
 
-- name: init repl_set2
-  shell: "{{ item }}"
-  run_once: true
-  when: mongod_deploy == "cluster"
-  with_items: 
-    - "{{ inf_app_path }}/mongo/mongo admin --port {{ mongod_port }} /tmp/user_init.js"
-    - "{{ inf_app_path }}/mongo/mongo admin --port {{ mongod_port }} /tmp/replset_init.js -u siteUserAdmin -p {{ mongo_admin_pwd }}"
+#- name: init repl_set2
+#  shell: "{{ item }}"
+#  when: mongod_deploy == "cluster"
+#  with_items: 
+#    - "{{ inf_app_path }}/mongo/mongo admin --port {{ mongod_port }} /tmp/user_init.js"
+#    - "{{ inf_app_path }}/mongo/mongo admin --port {{ mongod_port }} /tmp/replset_init.js -u siteUserAdmin -p {{ mongo_admin_pwd }}"
