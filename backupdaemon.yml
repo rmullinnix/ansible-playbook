@@ -1,0 +1,13 @@
+---
+# This Playbook deploys the components for mongo mms web components
+
+# setup and deploy mongo mms
+- hosts: backupdaemon
+  become: yes
+
+  roles:
+    - role: mms-backup-daemon
+
+  post_tasks:
+    - name: refresh consul
+      service: name=consul{{ init_suffix }} state=reloaded

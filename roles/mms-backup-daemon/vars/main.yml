@@ -1,0 +1,5 @@
+---
+mms_host: "{% for host in groups['webops'] %}{{ host }}{% endfor %}"
+mongodb_hosts: "siteUserAdmin:{{ mongo_admin_pwd }}@{% for host in groups['dbservers'] %}{{ host }}:27017{% if not loop.last %},{% endif %}{% endfor %}"
+mms_user: mongodb-mms
+mms_port: 27700

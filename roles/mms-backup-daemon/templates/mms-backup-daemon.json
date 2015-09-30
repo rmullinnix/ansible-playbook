@@ -1,0 +1,11 @@
+{
+    "service": {
+        "name": "mms-backup-daemon",
+        "tags": ["operations"],
+        "port": {{ mms_port }},
+        "check": {
+            "script": "{{ inf_app_path }}/mongo/mms-backup-daemon/daemon_status.sh",
+            "interval": "300s"
+        }
+    }
+}

@@ -21,10 +21,10 @@ msp0lnand002.etdbw.com
 msp0lnans001.etdbw.com
 
 [backupdaemon]
-msp0lnans005.etdbw.com
+msp0lnans002.etdbw.com
 
 [opsagents]
-msp0lnans002.etdbw.com
+msp0lnand002.etdbw.com
 
 [operations:children]
 backupdaemon

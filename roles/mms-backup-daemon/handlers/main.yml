@@ -1,0 +1,7 @@
+---
+# file: roles/mms-backup-daemon/handlers/main.yml
+- name: install mms-backup-daemon
+  command: /sbin/insserv -f mms-backup-daemon
+
+- name: restart mms-backup-daemon
+  service: name=mms-backup-daemon state=restarted

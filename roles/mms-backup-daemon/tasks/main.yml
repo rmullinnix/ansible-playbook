@@ -1,0 +1,41 @@
+---
+  - name: Ensure group is present
+    group: name="{{ inf_group }}" state=present
+
+  - name: Create user to be used by dameon processes
+    user: name="{{ mms_user }}" comment="mongodb mms" group="{{ inf_group }}"
+
+  - name: Create directory structure (app, log, data)
+    file: path={{ item }} state=directory group={{ inf_group }} owner={{ mms_user }}
+    with_items:
+      - "{{ inf_app_path }}/mongo"
+      - "{{ inf_log_path }}/mongo/mms"
+      - "{{ inf_data_path }}/mongo/backup"
+      - "/etc/mongodb-mms"
+
+#  - name: Copy and extract mongodb mms
+#    unarchive: src="/usr/nano/build/{{ ansible_environment }}/mongo/mongo-mms-backup-daemon.tar.gz" dest="{{ inf_app_path }}/mongo" owner={{ mms_user }} group={{ inf_group }}
+
+  - name: Add configuration files
+    template: src={{ item }} dest={{ inf_app_path }}/mongo/mms-backup-daemon/conf/{{ item }} mode=644 owner={{ mms_user }}
+    with_items:
+      - "conf-daemon.properties"
+      - "daemon.conf"
+    notify: 
+      - install mms-backup-daemon
+      - restart mms-backup-daemon
+
+  - name: Copy gen key
+    copy: src=gen.key dest=/etc/mongodb-mms/gen.key mode=600 owner={{ mms_user }}
+
+  - name: Add status utilities
+    template: src="daemon_status.sh" dest="{{ inf_app_path }}/mongo/mms-backup-daemon/bin/daemon_status.sh" mode=755 owner={{ mms_user }}
+
+  - name: Convert template init.d for mms backup
+    template: src=mms-backup-daemon.init.d dest=/etc/init.d/mms-backup-daemon mode=744
+    notify: 
+      - install mms-backup-daemon
+      - restart mms-backup-daemon
+
+  - name: Convert template consul registration for mms backup
+    template: src=mms-backup-daemon.json dest={{ etc_conf }}/consul.d/mms-backup-daemon mode=744
