@@ -1,0 +1,11 @@
+[consulagents]
+msp0lmngp[001:003].etdbw.com
+
+[dbservers]
+msp0lmngp001.etdbw.com mongo_role=primary
+msp0lmngp002.etdbw.com mongo_role=secondary
+msp0lmngp003.etdbw.com mongo_role=secondary
+
+[production:children]
+consulagents
+dbservers

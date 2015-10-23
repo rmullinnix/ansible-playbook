@@ -1,0 +1,43 @@
+---
+  - name: Ensure group is present
+    group: name="{{ mms_group }}" state=present
+
+  - name: Create user to be used by dameon processes
+    user: name="{{ mms_user }}" comment="mongodb mms" group="{{ inf_group }}"
+
+  - name: Create directory structure (app, log, data)
+    file: path={{ item }} state=directory group={{ inf_group }} owner={{ mms_user }}
+    with_items:
+      - "{{ inf_app_path }}/mongo"
+      - "{{ inf_app_path }}/mongo/mms"
+      - "{{ inf_app_path }}/mongo/mms/agent"
+      - "{{ inf_log_path }}/mongo/mms"
+      - "{{ inf_data_path }}/mongo/backup"
+      - "{{ db_data_path }}"
+      - "{{ db_log_path }}"
+
+  - name: Install mongo dependencies
+    zypper: name={{ item }} state="latest"
+    with_items:
+     - "cyrus-sasl"
+     - "krb5"
+     - "libgcc46"
+     - "libopenssl0_9_8"
+     - "libsnmp15"
+     - "libstdc++46"
+     - "zlib"
+
+  - name: Copy and extract mongodb mms
+    unarchive: src="/usr/nano/build/{{ ansible_environment }}/mongo/automation-agent.tar.gz" dest="{{ inf_app_path }}/mongo/mms/agent" owner={{ mms_user }} group={{ inf_group }}
+
+  - name: Add configuration files
+    template: src=local.config dest={{ inf_app_path }}/mongo/mms/agent/automation/local.config mode=644 owner={{ mms_user }}
+    notify: 
+      - install automation-agent
+      - restart automation-agent
+
+  - name: Convert template init.d for automation agent
+    template: src=automation-agent.init.d dest=/etc/init.d/automation-agent mode=744
+    notify: 
+      - install automation-agent
+      - restart automation-agent

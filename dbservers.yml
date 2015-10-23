@@ -6,11 +6,11 @@
   become: yes
 
   roles:
-    - role: mongod
+    - role: mongo-automation-agent
 
-  post_tasks:
-    - name: refresh consul
-      service: name=consul{{ init_suffix }} state=reloaded
+#  post_tasks:
+#    - name: refresh consul
+#      service: name=consul{{ init_suffix }} state=reloaded
 
 #    - name: refresh consul-template
 #      service: name=consul-template{{ init_suffix }} state=reloaded

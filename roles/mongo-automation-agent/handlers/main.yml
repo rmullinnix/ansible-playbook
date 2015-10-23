@@ -1,0 +1,7 @@
+---
+# file: roles/mongo-automation-agent/handlers/main.yml
+- name: install automation-agent
+  command: /sbin/insserv -f automation-agent
+
+- name: restart automation-agent
+  service: name=automation-agent state=restarted

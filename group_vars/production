@@ -1,0 +1,52 @@
+---
+# Production Environment - normally dev, int, stg, prod
+ansible_environment: prod
+
+# installation directories infrastructure executables, associated data, and log files
+inf_app_path: /usr/local
+inf_data_path: /usr/nano/data
+inf_log_path: /usr/nano/log
+
+# Common group used by infrastructure components
+inf_group: nanocore
+
+# Configuration directory and suffix for init.d file
+etc_conf: /etc
+init_suffix: ""
+
+# Runtime process management
+pid_path: /var/run
+lock_path: /var/lock
+
+# Apache configuration information
+apache_port: 8040
+apache_admin: Rob.Mullinnix@assurant.com
+apache_doc_root: /var/httpd/{{ ansible_environment }}
+apache_log_level: warn
+
+# Consul configuration
+consul_port: 8500
+consul_dns_port: 8600
+consul_rpc_port: 8400
+consul_serf_lan_port: 8301
+consul_serf_wan_port: 8302
+consul_server_port: 8300
+
+# Java version to install
+jdk_rpm: jdk-7u67-linux-x64.rpm
+
+# mongoDB configuration
+#   mongod_deploy:  single or cluster
+db_data_path: /var/mongo/data
+db_log_path: /var/mongo/log
+mongod_deploy: cluster
+mongo_admin_pwd: "n4n0prd1"
+mms_ops_host: msp0lnand002.etdbw.com
+mms_ops_port: 8180
+mms_group_id: 560be954e4b0089761e6b38d
+mms_api_key: 07751a39fa63d3bd8fbd0d3cf8faf338
+
+# ELK configuration
+elasticsearch_port: 9200
+logstash_port: 5075
+kibana_port: 6501
