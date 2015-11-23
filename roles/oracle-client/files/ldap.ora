@@ -1,0 +1,8 @@
+DIRECTORY_SERVERS= (
+	tnsnames.assurant.com:389:636,
+	tnsnames-atl.assurant.com:389:636,
+	tnsnames-msp.assurant.com:389:636
+)
+DEFAULT_ADMIN_CONTEXT = "dc=act,dc=assurant,dc=com"
+
+DIRECTORY_SERVER_TYPE = OID

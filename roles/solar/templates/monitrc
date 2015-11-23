@@ -1,0 +1,424 @@
+###############################################################################
+## Monit control file
+###############################################################################
+##
+## Comments begin with a '#' and extend through the end of the line. Keywords
+## are case insensitive. All path's MUST BE FULLY QUALIFIED, starting with '/'.
+##
+## Below you will find examples of some frequently used statements. For 
+## information about the control file and a complete list of statements and 
+## options, please have a look in the Monit manual.
+##
+##
+###############################################################################
+## Global section
+###############################################################################
+##
+## Start Monit in the background (run as a daemon):
+#
+ set daemon  60           # check services at 1-minute intervals
+     with start delay 10  # optional: delay the first check by 1-minute (by 
+#     with start delay 120  # optional: delay the first check by 2-minutes (by 
+#                           # default Monit check immediately after Monit start)
+#
+#
+## Set syslog logging with the 'daemon' facility. If the FACILITY option is
+## omitted, Monit will use 'user' facility by default. If you want to log to 
+## a standalone log file instead, specify the full path to the log file
+#
+ set logfile syslog facility log_daemon                       
+#
+#
+### Set the location of the Monit id file which stores the unique id for the
+### Monit instance. The id is generated and stored on first Monit start. By 
+### default the file is placed in $HOME/.monit.id.
+#
+# set idfile /var/.monit.id
+  set idfile {{ monit_home }}/.monit.id
+#
+### Set the location of the Monit state file which saves monitoring states
+### on each cycle. By default the file is placed in $HOME/.monit.state. If
+### the state file is stored on a persistent filesystem, Monit will recover
+### the monitoring state across reboots. If it is on temporary filesystem, the
+### state will be lost on reboot which may be convenient in some situations.
+#
+# set statefile /var/.monit.state
+  set statefile {{ monit_home }}/.monit.state
+
+#
+## Set the list of mail servers for alert delivery. Multiple servers may be 
+## specified using a comma separator. By default Monit uses port 25 - it is
+## possible to override this with the PORT option.
+#
+# set mailserver mail.bar.baz,               # primary mailserver
+#                backup.bar.baz port 10025,  # backup mailserver on port 10025
+#                localhost                   # fallback relay
+#
+#
+  set mailserver localhost
+
+## By default Monit will drop alert events if no mail servers are available. 
+## If you want to keep the alerts for later delivery retry, you can use the 
+## EVENTQUEUE statement. The base directory where undelivered alerts will be 
+## stored is specified by the BASEDIR option. You can limit the maximal queue
+## size using the SLOTS option (if omitted, the queue is limited by space 
+## available in the back end filesystem).
+#
+ set eventqueue
+     basedir {{ monit_basedir }}  # set the base directory where events will be stored
+#     slots 100           # optionally limit the queue size
+#
+#
+## Send status and events to M/Monit (for more informations about M/Monit 
+## see http://mmonit.com/). By default Monit registers credentials with 
+## M/Monit so M/Monit can smoothly communicate back to Monit and you don't
+## have to register Monit credentials manually in M/Monit. It is possible to
+## disable credential registration using the commented out option below. 
+## Though, if safety is a concern we recommend instead using https when
+## communicating with M/Monit and send credentials encrypted.
+#
+# set mmonit http://monit:monit@192.168.1.10:8080/collector
+#     # and register without credentials     # Don't register credentials
+#
+#
+#
+## Monit by default uses the following alert mail format:
+##
+## --8<--
+## From: monit@$HOST                         # sender
+## Subject: monit alert --  $EVENT $SERVICE  # subject
+##
+## $EVENT Service $SERVICE                   #
+##                                           #
+## 	Date:        $DATE                   #
+## 	Action:      $ACTION                 #
+## 	Host:        $HOST                   # body
+## 	Description: $DESCRIPTION            #
+##                                           #
+## Your faithful employee,                   #
+## Monit                                     #
+## --8<--
+##
+## You can override this message format or parts of it, such as subject
+## or sender using the MAIL-FORMAT statement. Macros such as $DATE, etc.
+## are expanded at runtime. For example, to override the sender, use:
+#
+# set mail-format { from: monit@foo.bar }
+#
+#
+## You can set alert recipients whom will receive alerts if/when a 
+## service defined in this file has errors. Alerts may be restricted on 
+## events by using a filter as in the second example below. 
+#
+# set alert sysadm@foo.bar                       # receive all alerts
+  set alert mike.bunten@assurant.com only on { nonexist, timeout, resource, connection }
+#  set alert randy.greenwood@assurant.com
+  set alert eric.branson@assurant.com only on { nonexist, timeout, resource, connection }
+  set alert andrew.kile@assurant.com only on { nonexist, timeout, resource, connection }
+#  set alert linda.harnack@assurant.com
+#  set alert mike.schath@assurant.com
+# set alert manager@foo.bar only on { timeout }  # receive just service-
+#                                                # timeout alert
+#
+#
+## Monit has an embedded web server which can be used to view status of 
+## services monitored and manage services from a web interface. See the
+## Monit Wiki if you want to enable SSL for the web server. 
+#
+ set httpd port {{ monit_port }} #and
+#     use address localhost  # only accept connection from localhost
+#     allow localhost        # allow localhost to connect to the server and
+#     allow AEB7-2UA1170ZRV
+     allow {{ monit_user }}:{{ monit_pwd }}      # require user 'admin' with password 'monit'
+#     allow @monit           # allow users of group 'monit' to connect (rw)
+#     allow @users readonly  # allow users of group 'users' to connect readonly
+#     allow @solar
+#
+#
+###############################################################################
+## Services
+###############################################################################
+##
+## Check general system resources such as load average, cpu and memory
+## usage. Each test specifies a resource, conditions and the action to be
+## performed should a test fail.
+#
+#  check system myhost.mydomain.tld
+#   check system mci0lstsd002.empbenins.com
+#    if loadavg (1min) > 4 then alert
+#    if loadavg (5min) > 2 then alert
+#    if memory usage > 75% then alert
+#    if swap usage > 25% then alert
+#    if cpu usage (user) > 70% then alert
+#    if cpu usage (system) > 30% then alert
+#    if cpu usage (wait) > 20% then alert
+#
+#    
+## Check if a file exists, checksum, permissions, uid and gid. In addition
+## to alert recipients in the global section, customized alert can be sent to 
+## additional recipients by specifying a local alert handler. The service may 
+## be grouped using the GROUP option. More than one group can be specified by
+## repeating the 'group name' statement.
+#    
+#  check file apache_bin with path /usr/local/apache/bin/httpd
+#    if failed checksum and 
+#       expect the sum 8f7f419955cefa0b33a2ba316cba3659 then unmonitor
+#    if failed permission 755 then unmonitor
+#    if failed uid root then unmonitor
+#    if failed gid root then unmonitor
+#    alert security@foo.bar on {
+#           checksum, permission, uid, gid, unmonitor
+#        } with the mail-format { subject: Alarm! }
+#    group server
+#
+#    
+## Check that a process is running, in this case Apache, and that it respond
+## to HTTP and HTTPS requests. Check its resource usage such as cpu and memory,
+## and number of children. If the process is not running, Monit will restart 
+## it by default. In case the service is restarted very often and the 
+## problem remains, it is possible to disable monitoring using the TIMEOUT
+## statement. This service depends on another service (apache_bin) which
+## is defined above.
+#    
+#  check process apache with pidfile /usr/local/apache/logs/httpd.pid
+#    start program = "/etc/init.d/httpd start" with timeout 10 seconds
+#    stop program  = "/etc/init.d/httpd stop"
+#    if cpu > 60% for 2 cycles then alert
+#    if cpu > 80% for 5 cycles then restart
+#    if totalmem > 200.0 MB for 5 cycles then restart
+#    if children > 250 then restart
+#    if loadavg(5min) greater than 10 for 8 cycles then stop
+#    if failed host www.tildeslash.com port 80 protocol http
+#       and request "/somefile.html"
+#       then restart
+#    if failed port 443 type tcpssl protocol http
+#       with timeout 15 seconds
+#       then restart
+#    if 3 restarts within 5 cycles then timeout
+#    depends on apache_bin
+#    group server
+#    
+
+  check program slusvchkoraconn with path "{{ solar_app_path }}/solar/scripts/slusvchkoraconn.sh" with timeout 15 seconds
+    if status == 1 then exec "/usr/local/bin/monit -g {{ solar_monit_group }} restart"
+    if status != 0 for 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process utusvnamesrvr with pidfile {{ pid_dir }}/utusvnamesrvr.pid
+    start program = "/etc/init.d/utusvnamesrvr{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/utusvnamesrvr{{ env_short_cd }} stop"
+    if failed port 20010 type tcp 
+       with timeout 15 seconds
+       then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+    
+  check process utusvlogger with pidfile {{ pid_dir }}/utusvlogger.pid
+    start program = "/etc/init.d/utusvlogger{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/utusvlogger{{ env_short_cd }} stop"
+    if failed port 20011 type tcp 
+       with timeout 15 seconds
+       then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+    
+  check process utvsvvalidvalues with pidfile {{ pid_dir }}/utvsvvalidvalues.pid
+    start program = "/etc/init.d/utvsvvalidvalues{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/utvsvvalidvalues{{ env_short_cd }} stop"
+    if failed port 20110 type tcp 
+       with timeout 15 seconds
+       then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+   
+  check process slusvthrift with pidfile {{ pid_dir }}/slusvthrift.pid
+    start program = "/etc/init.d/slusvthrift{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slusvthrift{{ env_short_cd }} stop"
+    if failed port 20100 type tcp 
+       with timeout 15 seconds
+       then restart
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 95% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process slasvgroup with pidfile {{ pid_dir }}/slasvgroup.pid
+    start program = "/etc/init.d/slasvgroup{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slasvgroup{{ env_short_cd }} stop"
+    if failed port 20150 type tcp 
+       with timeout 15 seconds
+       then restart
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 95% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process slpsvproducer with pidfile {{ pid_dir }}/slpsvproducer.pid
+    start program = "/etc/init.d/slpsvproducer{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slpsvproducer{{ env_short_cd }} stop"
+    if failed port 20151 type tcp 
+       with timeout 15 seconds
+       then restart
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 95% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process slcsvcensus with pidfile {{ pid_dir }}/slcsvcensus.pid
+    start program = "/etc/init.d/slcsvcensus{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slcsvcensus{{ env_short_cd }} stop"
+    if failed port 20152 type tcp 
+       with timeout 15 seconds
+       then restart
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 95% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process slasvmisc with pidfile {{ pid_dir }}/slasvmisc.pid
+    start program = "/etc/init.d/slasvmisc{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slasvmisc{{ env_short_cd }} stop"
+    if failed port 20153 type tcp 
+       with timeout 15 seconds
+       then restart
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 95% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process slesvedit with pidfile {{ pid_dir }}/slesvedit.pid
+    start program = "/etc/init.d/slesvedit{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slesvedit{{ env_short_cd }} stop"
+    if failed port 20155 type tcp 
+       with timeout 15 seconds
+       then restart
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 95% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process slasvscheda with pidfile {{ pid_dir }}/slasvscheda.pid
+    start program = "/etc/init.d/slasvscheda{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slasvscheda{{ env_short_cd }} stop"
+    if failed port 20156 type tcp 
+       with timeout 15 seconds
+       then restart
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 95% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process slasvplan with pidfile {{ pid_dir }}/slasvplan.pid
+    start program = "/etc/init.d/slasvplan{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slasvplan{{ env_short_cd }} stop"
+    if failed port 20160 type tcp 
+       with timeout 15 seconds
+       then restart
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 95% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process slasvcalc with pidfile {{ pid_dir }}/slasvcalc.pid
+    start program = "/etc/init.d/slasvcalc{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slasvcalc{{ env_short_cd }} stop"
+    if failed port 20161 type tcp 
+       with timeout 15 seconds
+       then restart
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 95% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process slasvviewprint with pidfile {{ pid_dir }}/slasvviewprint.pid
+    start program = "/etc/init.d/slasvviewprint{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slasvviewprint{{ env_short_cd }} stop"
+    if failed port 20162 type tcp 
+       with timeout 15 seconds
+       then restart
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 95% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process slasvoutput with pidfile {{ pid_dir }}/slasvoutput.pid
+    start program = "/etc/init.d/slasvoutput{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slasvoutput{{ env_short_cd }} stop"
+    if failed port 20170 type tcp 
+       with timeout 15 seconds
+       then restart
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 95% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process slwsvqueue with pidfile {{ pid_dir }}/slwsvqueue.pid
+    start program = "/etc/init.d/slwsvqueue{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slwsvqueue{{ env_short_cd }} stop"
+    if failed port 20171 type tcp 
+       with timeout 15 seconds
+       then restart
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 95% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process slrsvrequest with pidfile {{ pid_dir }}/slrsvrequest.pid
+    start program = "/etc/init.d/slrsvrequest{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slrsvrequest{{ env_short_cd }} stop"
+    if failed port 20172 type tcp 
+       with timeout 15 seconds
+       then restart
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 95% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process slrsvrequest2 with pidfile {{ pid_dir }}/slrsvrequest2.pid
+    start program = "/etc/init.d/slrsvrequest2{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slrsvrequest2{{ env_short_cd }} stop"
+    if failed port 20174 type tcp 
+       with timeout 15 seconds
+       then restart
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 95% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process slrsvrequest3 with pidfile {{ pid_dir }}/slrsvrequest3.pid
+    start program = "/etc/init.d/slrsvrequest3{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slrsvrequest3{{ env_short_cd }} stop"
+    if failed port 20175 type tcp 
+       with timeout 15 seconds
+       then restart
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 95% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process slwsvdocedit with pidfile {{ pid_dir }}/slwsvdocedit.pid
+    start program = "/etc/init.d/slwsvdocedit{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slwsvdocedit{{ env_short_cd }} stop"
+    if failed port 20173 type tcp 
+       with timeout 15 seconds
+       then restart
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 95% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+
+  check process slasvinterfacez with pidfile {{ pid_dir }}/slasvinterfacez.pid
+    start program = "/etc/init.d/slasvinterfacez{{ env_short_cd }} start" with timeout 10 seconds
+    stop program  = "/etc/init.d/slasvinterfacez{{ env_short_cd }} stop"
+    if totalmemory > 50% for 1 cycles then restart
+    if totalcpu > 50% for 1 cycles then restart
+    if 2 restarts within 5 cycles then unmonitor
+    group {{ solar_monit_group }}
+    
+#  check process slasvinterfacez2 with pidfile {{ pid_dir }}/slasvinterfacez2.pid
+#    start program = "/etc/init.d/slasvinterfacez2 start" with timeout 10 seconds
+#    stop program  = "/etc/init.d/slasvinterfacez2 stop"
+#    if totalmemory > 50% for 1 cycles then restart
+#    if totalcpu > 95% for 1 cycles then restart
+#    if 2 restarts within 5 cycles then unmonitor
+#    group {{ solar_monit_group }}

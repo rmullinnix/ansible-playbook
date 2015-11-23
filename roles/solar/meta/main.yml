@@ -1,0 +1,6 @@
+---
+dependencies:
+  - { role: solar_lib }
+  - { role: oracle-client }
+  - { role: mqm-client }
+  - { role: monit }

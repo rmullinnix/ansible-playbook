@@ -1,0 +1,59 @@
+# Solar Environment Variables
+solar_env: dvelop1
+solar_app_path: /usr/nano/solar
+system_high_level: sl
+arch_version: 3.0
+xerces_version: 1.5
+solar_version: trunk
+queuemn: MD11MO10
+mq_env: D1
+oracle_home: /opt/oracle/product/11.2.0/client
+oracle_sid: fd32
+oracle_lib: lib
+
+# Solar Services Configuration Parameters
+calc_port: 20161
+calc_thread: 5
+calc_connect: /
+calc_backlog: 30
+
+group_port: 20150
+group_thread: 10
+group_connect: /
+group_backlog: 30
+
+plan_port: 20160
+plan_thread: 10
+plan_connect: /
+plan_backlog: 30
+
+census_port: 20152
+census_thread: 5
+census_connect: /
+census_backlog: 30
+
+edit_port: 20155
+edit_thread: 5
+edit_connect: /
+edit_backlog: 30
+
+producer_port: 20151
+producer_thread: 5
+producer_connect: /
+producer_backlog: 30
+
+thrift_port: 20100
+thrift_thread: 10
+thrift_connect: /
+thrift_log_level: 3
+
+namesrvr_port: 20010
+namesrvr_thread: 10
+namesrvr_connect: /
+namesrvr_backlog: 30
+
+validvalues_port: 20110
+validvalues_thread: 10
+validvalues_connect: /
+validvalues_backlog: 30
+

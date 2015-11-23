@@ -9,10 +9,15 @@ msp0lnans002.etdbw.com
 msp0lnans003.etdbw.com
 msp0lnans005.etdbw.com
 
+[opsdbservers]
+# msp0lnans002.etdbw.com mongo_role=primary
+# msp0lnans003.etdbw.com mongo_role=secondary
+msp0lnans004.etdbw.com mongo_role=secondary
+
 [dbservers]
-msp0lnans002.etdbw.com mongo_role=primary
-msp0lnans003.etdbw.com mongo_role=secondary
-msp0lnans005.etdbw.com mongo_role=secondary
+msp0lnans005.etdbw.com
+msp0lnans007.etdbw.com
+msp0lnans008.etdbw.com
 
 [webops]
 msp0lnand002.etdbw.com
@@ -21,7 +26,7 @@ msp0lnand002.etdbw.com
 msp0lnans001.etdbw.com
 
 [backupdaemon]
-msp0lnans002.etdbw.com
+msp0lnans007.etdbw.com
 
 [opsagents]
 msp0lnand002.etdbw.com

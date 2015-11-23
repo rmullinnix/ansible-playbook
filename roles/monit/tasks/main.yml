@@ -1,0 +1,9 @@
+---
+# installs monit on server(s)
+
+  - name: ensure /usr/local/bin exists or create
+    file: path=/usr/local/bin state=directory
+
+# copy monit executable to /usr/local/bin
+  - name: Install monit executable
+    copy: src=/usr/nano/build/{{ ansible_environment }}/monit/monit dest=/usr/local/bin mode=755

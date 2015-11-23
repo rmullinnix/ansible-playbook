@@ -1,0 +1,9 @@
+---
+# This Playbook deploys solar
+
+# deploy Solar
+- hosts: solar
+  become: yes
+
+  roles:
+    - role: solar

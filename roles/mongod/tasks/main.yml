@@ -8,22 +8,22 @@
   - name: Create user to be used by dameon processes
     user: name="{{ mongo_user }}" comment="Nanotech Logging Services" group="{{ mongo_group }}"
 
-  - name: Install mongo dependencies
-    zypper: name={{ item }} state="latest"
-    with_items:
-     - "cyrus-sasl"
-     - "krb5"
-     - "libgcc46"
-     - "libopenssl0_9_8"
-     - "libsnmp15"
-     - "libstdc++46"
-     - "zlib"
+#  - name: Install mongo dependencies
+#    zypper: name={{ item }} state="latest"
+#    with_items:
+#     - "cyrus-sasl"
+#     - "krb5"
+#     - "libgcc46"
+#     - "libopenssl0_9_8"
+#     - "libsnmp15"
+#     - "libstdc++46"
+#     - "zlib"
 
   - name: Create Mongo app, data and log directories
     file: path={{ item }} state=directory owner={{ mongo_user }} group={{ mongo_group }} mode=755
     with_items:
      - "{{ inf_app_path }}/mongo"
-     - "{{ db_data_path }}/mongo/mongod"
+     - "{{ db_data_path }}"
      - "{{ db_log_path }}"
      - "/var/run/mongodb"
 
@@ -50,11 +50,11 @@
   - name: Add mongod status utility
     template: src="mongod_status.sh" dest="{{ inf_app_path }}/mongo/mongo_status.sh" mode=755
 
-  - name: Add consul-template ctmpl file
-    copy: src=mongod.{{ mongod_deploy }}.ctmpl dest={{ etc_conf}}/consul-template/ctmpl/mongod.ctmpl
+#  - name: Add consul-template ctmpl file
+#    copy: src=mongod.{{ mongod_deploy }}.ctmpl dest={{ etc_conf}}/consul-template/ctmpl/mongod.ctmpl
 
-  - name: Add file consul-template conf
-    template: src=consul-template.conf dest={{ etc_conf }}/consul-template/conf.d/mongod mode=744
+#  - name: Add file consul-template conf
+#    template: src=consul-template.conf dest={{ etc_conf }}/consul-template/conf.d/mongod mode=744
 
   - name: Add file consul service config
     template: src=mongod.json dest={{ etc_conf }}/consul.d/mongod.json mode=744

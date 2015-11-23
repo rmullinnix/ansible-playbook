@@ -37,10 +37,14 @@ jdk_rpm: jdk-7u67-linux-x64.rpm
 
 # mongoDB configuration
 #   mongod_deploy:  single or cluster
-db_data_path: /usr/nano/data
+db_data_path: /var/mongo/data/OpsMgr
 db_log_path: /usr/nano/log/mongo
 mongod_deploy: cluster
 mongo_admin_pwd: "n4n0ops1"
+mms_ops_host: msp0lnand002.etdbw.com
+mms_ops_port: 8180
+mms_group_id: 55dddf50e4b00835ccf28e19
+mms_api_key: 8baa26bdcfb7d739f2be0d3066f13e25
 
 # ELK configuration
 elasticsearch_port: 9200

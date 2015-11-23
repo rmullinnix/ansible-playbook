@@ -1,0 +1,9 @@
+---
+# installs common libraries on server(s)
+
+  - name: ensure /usr/local/lib exists or create
+    file: path=/usr/local/lib state=directory
+
+# copy and unpack solar common libraries
+  - name: Install solar common libraries
+    unarchive: src=/usr/nano/build/{{ ansible_environment }}/solar_lib/solar_lib.tar.gz dest=/usr/local/lib

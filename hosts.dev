@@ -24,6 +24,9 @@ msp0lnand001.etdbw.com
 [logstash]
 msp0lnand001.etdbw.com host_ip=10.80.129.197
 
+[solar]
+msp0laedd001.etdbw.com
+
 [webservers]
 msp0lnand002.etdbw.com
 
@@ -33,4 +36,8 @@ consulservers
 dbservers
 elasticsearch
 logstash
+solar
 webservers
+
+[solardev:children]
+solar

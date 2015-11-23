@@ -1,0 +1,7 @@
+TRACE_LEVEL_CLIENT = OFF
+names.directory_path = (LDAP,TNSNAMES,HOSTNAME)
+automatic_ipc = off
+
+#sqlnet.authentication_services = (NONE)
+#names.default_domain = world
+#name.default_zone = world

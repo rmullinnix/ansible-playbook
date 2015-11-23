@@ -1,0 +1,112 @@
+---
+# installs solar n server(s)
+
+  - name: Ensure group is present
+    group: name="{{ solar_group }}" state=present
+
+  - name: Create user to be used by dameon processes
+    user: name="{{ solar_user }}" comment="User for running solar services" group="{{ solar_group }}"
+
+  - name: Create Solar app, bin, lib, log and script directories
+    file: path={{ item }} state=directory owner={{ solar_user }} group={{ solar_group }} mode=755
+    with_items:
+     - "{{ solar_app_path }}"
+     - "{{ solar_app_path }}/log"
+     - "{{ solar_app_path }}/scripts"
+
+
+# copy and unarchive solar libraries and executables
+  - name: Install Solar libraries and executables
+    unarchive: src=/usr/nano/build/{{ ansible_environment }}/solar/solar.tar.gz dest={{ solar_app_path }} owner={{ solar_user }} group={{ solar_group }}
+
+# copy config templates files to scripts directory
+  - name: Add configuration template files
+    template: src="{{ item }}.cfg" dest="{{ solar_app_path }}/scripts/{{ item }}{{ env_short_cd }}.cfg" mode=750 owner={{ solar_user }} group={{ solar_group }}
+    with_items:
+     - "slasvcalc"
+     - "slasvgroup"
+     - "slasvplan"
+     - "slcsvcensus"
+     - "slesvedit"
+     - "slpsvproducer"
+     - "slusvthrift"
+     - "utusvnamesrvr"
+     - "utvsvvalidvalues"
+
+# copy script templates files to scripts directory
+  - name: Add script template files
+    template: src="{{ item }}" dest="{{ solar_app_path }}/scripts/{{ item }}" mode=750 owner={{ solar_user }} group={{ solar_group }}
+    with_items:
+     - "slasvbatchloadv2.sh"
+     - "slasvbatchrnwlexportscv2.sh"
+     - "slasvbatchrnwlltr4v2.sh"
+     - "slusvthrift.sh"
+     - "slasvbatchannivltrv2.sh"
+     - "slasvbatchmultilinephilv2.sh"
+     - "slasvbatchrnwlltr1v2.sh"
+     - "slasvbatchselectv2.sh"
+     - "slasvbatchcrosssellloadv2.sh"
+     - "slasvbatchratecompareghv2.sh"
+     - "slasvbatchrnwlltr2v2.sh"
+     - "slasvbatchtpaload.sh"
+     - "slasvbatchloadghv2.sh"
+     - "slasvbatchratecomparescv2.sh"
+     - "slasvbatchrnwlltr3v2.sh"
+     - "slnrenewalbatchrtnotev2.sh"
+     - "env_setup.sh"
+
+# copy init.d templates files to /etc/init.d directory
+  - name: Add init.d template files to /etc/init.d
+    template: src="{{ item }}.init.d" dest="/etc/init.d/{{ item }}{{ env_short_cd }}" mode=750 owner={{ solar_user }} group={{ solar_group }}
+    with_items:
+     - "slasvcalc"
+     - "slasvgroup"
+     - "slasvinterfacez"
+     - "slasvinterfacez2"
+     - "slasvmisc"
+     - "slasvoutput"
+     - "slasvplan"
+     - "slasvscheda"
+     - "slasvviewprint"
+     - "slcsvcensus"
+     - "slesvedit"
+     - "slpsvproducer"
+     - "slrsvrequest"
+     - "slrsvrequest2"
+     - "slrsvrequest3"
+     - "slusvthrift"
+     - "slwsvdocedit"
+     - "slwsvqueue"
+     - "utusvlogger"
+     - "utusvnamesrvr"
+     - "utvsvvalidvalues"
+
+# install Solar services
+  - name: install solar services
+    command: /sbin/insserv -f {{ item }}
+    with_items:
+     - "slasvcalc{{ env_short_cd }}"
+     - "slasvgroup{{ env_short_cd }}"
+     - "slasvinterfacez{{ env_short_cd }}"
+     - "slasvinterfacez2{{ env_short_cd }}"
+     - "slasmisc{{ env_short_cd }}"
+     - "slasvoutput{{ env_short_cd }}"
+     - "slasvplan{{ env_short_cd }}"
+     - "slasvscheda{{ env_short_cd }}"
+     - "slasvviewprint{{ env_short_cd }}"
+     - "slcsvcensus{{ env_short_cd }}"
+     - "slasvedit{{ env_short_cd }}"
+     - "slpsvproducer{{ env_short_cd }}"
+     - "slrsvrequest{{ env_short_cd }}"
+     - "slrsvrequest2{{ env_short_cd }}"
+     - "slrsvrequest3{{ env_short_cd }}"
+     - "slusvthrift{{ env_short_cd }}"
+     - "slwsdocedit{{ env_short_cd }}"
+     - "slwsvqueue{{ env_short_cd }}"
+     - "utusvlogger{{ env_short_cd }}"
+     - "utusvnamesrvr{{ env_short_cd }}"
+     - "utusvvalidvalues{{ env_short_cd }}"
+
+# install the control file for monit
+  - name: create the monit control file
+    template: src=monitrc dest=/etc/monitrc

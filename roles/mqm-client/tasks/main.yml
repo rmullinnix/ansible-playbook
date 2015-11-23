@@ -1,0 +1,30 @@
+---
+# installs mqm-client on server(s)
+
+  - name: Create mq series client install directory
+    file: path={{ mqm_install }} state=directory
+
+# copy and unpack mqm-client archive
+  - name: Install mqm executables
+    unarchive: src=/usr/nano/build/{{ ansible_environment }}/mqm-client/mqc7_7.0.1.4_linuxx86.tar.gz dest={{ mqm_install }}
+
+# run the license accept script
+  - name: Accept MQ Series client license
+    command: ./mqlicense.sh -accept
+      chdir={{ mqm_install }}
+
+# install rpm packages
+  - name: install rpm packages for mq series client
+    command: rpm -i {{ item }}
+    with_items:
+      - "MQSeriesRuntime-7.0.1-4.i386.rpm"
+      - "gsk7bas-7.0-4.29.i386.rpm"
+      - "gskcrypt32-8.0.14.7.linux.x86.rpm"
+      - "gskssl32-8.0.14.7.linux.x86.rpm"
+      - "MQSeriesKeyMan-7.0.1-4.i386.rpm"
+      - "MQSeriesClient-7.0.1-4.i386.rpm"
+      - "MQSeriesJava-7.0.1-4.i386.rpm"
+
+# install mqseries TAB config
+#  - name: Add oratab file
+#    template: src=oratab dest=/etc/oratab mode=644 owner={{ mqm_user }} group={{ mqm_group }}

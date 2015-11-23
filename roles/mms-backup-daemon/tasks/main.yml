@@ -10,11 +10,11 @@
     with_items:
       - "{{ inf_app_path }}/mongo"
       - "{{ inf_log_path }}/mongo/mms"
-      - "{{ inf_data_path }}/mongo/backup"
+      - "{{ inf_data_path }}/mongo/mms-backup-daemon"
       - "/etc/mongodb-mms"
 
-#  - name: Copy and extract mongodb mms
-#    unarchive: src="/usr/nano/build/{{ ansible_environment }}/mongo/mongo-mms-backup-daemon.tar.gz" dest="{{ inf_app_path }}/mongo" owner={{ mms_user }} group={{ inf_group }}
+  - name: Copy and extract mongodb mms
+    unarchive: src="/usr/nano/build/{{ ansible_environment }}/mongo/mongo-mms-backup-daemon.tar.gz" dest="{{ inf_app_path }}/mongo" owner={{ mms_user }} group={{ inf_group }}
 
   - name: Add configuration files
     template: src={{ item }} dest={{ inf_app_path }}/mongo/mms-backup-daemon/conf/{{ item }} mode=644 owner={{ mms_user }}

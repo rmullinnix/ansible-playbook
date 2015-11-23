@@ -1,0 +1,32 @@
+---
+# installs oracle-client on server(s)
+
+  - name: Ensure group is present
+    group: name="{{ oracle_group }}" state=present
+
+  - name: Create user to be used by dameon processes
+    user: name="{{ oracle_user }}" comment="Oracle process owner" group="{{ oracle_group }}"
+
+  - name: Create oracle home and network directories
+    file: path={{ item }} state=directory owner={{ oracle_user }} group={{ oracle_group }} mode=755
+    with_items:
+     - "{{ oracle_base }}"
+     - "{{ oracle_home }}"
+     - "{{ oracle_home }}/network"
+     - "{{ oracle_home }}/network/admin"
+
+# copy and unpack oracle-client archive
+  - name: Install oracle executables
+    unarchive: src=/usr/nano/build/{{ ansible_environment }}/oracle-client/oracle-client-11.2.0.tar.gz dest={{ oracle_home }} owner={{ oracle_user }} group={{ oracle_group }}
+
+# set default oracle network configuration
+  - name: Add network admin configuration files
+    copy: src={{ item }} dest={{ oracle_home }}/network/admin/ mode=644 owner={{ oracle_user }} group={{ oracle_group }}
+    with_items:
+      - "ldap.ora"
+      - "sqlnet.ora"
+      - "tnsnames.ora"
+
+# create the oratab config file for the environment oracle_sid
+  - name: Add oratab file
+    template: src=oratab dest=/etc/oratab mode=644 owner={{ oracle_user }} group={{ oracle_group }}
