@@ -1,0 +1,6 @@
+---
+# ldap configuration information
+ldap_url: "ldap://directory.assurant.com:389"
+ldap_user_pattern: "uid={0},o=InternalUsers,dc=assurant,dc=com"
+ldap_role_base: "ou=AssurNet,o=Applications,dc=assurant,dc=com"
+ldap_role_name: "cn"

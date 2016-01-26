@@ -1,6 +1,0 @@
----
-consul_config_dir: /etc/consul.d
-consul_data_dir: /usr/nano/data/consul
-consul_log_dir: /usr/nano/log
-consul_log_lvl: WARN 
-consul_ui_dir: /var/httpd/prod/ui

@@ -1,0 +1,4 @@
+dynatrace_url: msp0ldynt002.etdbw.com:9995
+dynatrace_home: "{{ inf_app_path }}/dynatrace"
+dynatrace_agent: "{{ dynatrace_home }}/agent/lib64"
+

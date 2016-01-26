@@ -9,7 +9,7 @@
     copy: src=/usr/nano/build/{{ ansible_environment }}/logstash-forwarder/logstash-forwarder mode=744 dest={{ inf_app_path }}/logstash-forwarder/logstash-forwarder
 
   - name: Install Certificate
-    copy: src=logstash-forwarder-{{ ansible_environment }}.crt mode=644 dest=/etc/ssl/certs/logstash-forwarder-{{ ansible_environment }}.crt
+    copy: src=logstash-forwarder{{ init_suffix }}.crt mode=644 dest=/etc/ssl/certs/logstash-forwarder-{{ ansible_environment }}.crt
 
   - name: Install logstash-forwarder ctmpl file
     template: src=logstash-forwarder.ctmpl mode=644 dest={{ etc_conf }}/consul-template/ctmpl/logstash-forwarder.ctmpl

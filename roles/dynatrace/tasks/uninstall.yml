@@ -1,0 +1,8 @@
+---
+  - name: Remove dynatrace user
+    user: name="{{ dynatrace_user }}" state=absent remove=true
+    ignore_errors: yes
+
+  - name: Remove dynatrace application directory
+    file: path="{{ dynatrace_home }}" state=absent
+    ignore_errors: yes

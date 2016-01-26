@@ -1,0 +1,35 @@
+---
+  - name: Create tomcat directory structure
+    file: path="{{ item }}" state=directory owner="{{ tomcat_user }}" group="{{ tomcat_group }}" mode=755
+    with_items:
+      - "{{ tcat_base }}"
+      - "{{ tcat_base }}/conf"
+      - "{{ tcat_base }}/conf/Catalina"
+      - "{{ tcat_base }}/conf/Catalina/localhost"
+      - "{{ tcat_base }}/logs"
+      - "{{ tcat_base }}/tcat-data"
+      - "{{ tcat_base }}/temp"
+      - "{{ tcat_base }}/work"
+      - "{{ tcat_base }}/{{ tcat_app_base }}"
+
+  - name: Process tomcat configuration templates
+    template: src={{ item.src }} dest={{ item.dest }} owner="{{ tomcat_user }}" group="{{ tomcat_group }}"
+    with_items:
+      - { src: "server.xml", dest: "{{ tcat_base }}/conf/server.xml" }
+      - { src: "catalina.properties", dest: "{{ tcat_base }}/conf/catalina.properties" }
+      - { src: "tcat7-linux.sh", dest: "{{ tcat_base }}/conf/Catalina/localhost/tcat7-linux.sh" }
+      - { src: "tcat-env.conf", dest: "{{ tcat_base }}/conf/Catalina/localhost/tcat-env.conf" }
+
+  - name: Copy tomcat configuration files
+    copy: src={{ item.src }} dest={{ item.dest }} mode=755 owner="{{ tomcat_user }}" group="{{ tomcat_group }}"
+    with_items:
+      - { src: "catalina.policy", dest: "{{ tcat_base }}/conf/catalina.policy" }
+      - { src: "context.xml", dest: "{{ tcat_base }}/conf/context.xml" }
+      - { src: "logging.properties", dest: "{{ tcat_base }}/conf/logging.properties" }
+      - { src: "tomcat-users.xml", dest: "{{ tcat_base }}/conf/tomcat-users.xml" }
+      - { src: "web.xml", dest: "{{ tcat_base }}/conf/web.xml" }
+      - { src: "catalina.sh", dest: "{{ tcat_base }}/conf/Catalina/localhost/catalina.sh" }
+
+  - name: Copy cluster application war files
+    copy: src="/usr/nano/build/{{ ansible_environment }}/tomcat/{{ tcat_cluster_name }}/{{ item }}" dest="{{ tcat_base }}/{{ tcat_app_base }}/{{ item }}" owner="{{ tomcat_user }}" group="{{ tomcat_group }}"
+    with_items: "{{ cluster_app_list }}"

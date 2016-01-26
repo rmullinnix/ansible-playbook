@@ -25,12 +25,12 @@ rc_reset
 prog="consul"
 user="{{ consul_user }}"
 group="{{ consul_group }}"
-exec="{{ consul_app_path }}/bin/$prog"
+exec="{{ consul_app_path }}/$prog"
 pidfile="{{ pid_path }}/$prog.pid"
 lockfile="{{ lock_path }}/subsys/$prog"
 logfile="{{ consul_log_dir}}/$prog"
-conffile="{{ etc_conf }}/consul.conf"
-confdir="{{ etc_conf }}/consul.d"
+conffile="{{ consul_app_path }}/conf/consul.conf"
+confdir="{{ consul_config_dir }}"
 uidir="{{ apache_doc_root }}/consului"
  
 # pull in sysconfig settings

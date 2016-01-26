@@ -1,0 +1,100 @@
+---
+- hosts: consulagents
+  become: yes
+
+  tasks:
+    - name: stop consul agents
+      service: name=consul state=stopped
+      ignore_errors: yes
+
+    - name: uninstall service
+      command: /sbin/insserv -r consul
+      ignore_errors: yes
+
+    - name: remove directories
+      command: rm -fr {{ inf_app_path }}/consul
+      ignore_errors: yes
+
+    - name: remove data directory
+      command: rm -fr {{ inf_data_path }}/consul
+      ignore_errors: yes
+
+    - name: remove init script
+      command: rm /etc/init.d/consul
+      ignore_errors: yes
+
+    - name: remove consul user
+      user: name=consul state=absent remove=yes
+      ignore_errors: yes
+
+- hosts: consulservers
+  become: yes
+
+  tasks:
+    - name: stop consul agents
+      service: name=consul state=stopped
+      ignore_errors: yes
+
+    - name: uninstall service
+      command: /sbin/insserv -r consul
+      ignore_errors: yes
+
+    - name: remove directories
+      command: rm -fr {{ inf_app_path }}/consul
+      ignore_errors: yes
+
+    - name: remove data directory
+      command: rm -fr {{ inf_data_path }}/consul
+      ignore_errors: yes
+
+    - name: remove init script
+      command: rm /etc/init.d/consul
+      ignore_errors: yes
+
+    - name: remove consul user
+      user: name=consul state=absent remove=yes
+      ignore_errors: yes
+
+- hosts: consului
+  become: yes
+
+  tasks:
+    - name: stop apache
+      service: name=apache2 state=stopped
+      ignore_errors: yes
+
+    - name: uninstall service
+      command: /sbin/insserv -r apache2
+      ignore_errors: yes
+
+    - name: remove directories
+      command: rm -fr {{ inf_app_path }}/apache2
+      ignore_errors: yes
+
+    - name: remove init script
+      command: rm /etc/init.d/apache2
+      ignore_errors: yes
+
+    - name: remove apache user
+      user: name=apache state=absent remove=yes
+      ignore_errors: yes
+
+- hosts: consultemplate
+  become: yes
+
+  tasks:
+    - name: stop consul-template
+      service: name=consul-template state=stopped
+      ignore_errors: yes
+
+    - name: uninstall service
+      command: /sbin/insserv -r consul-template
+      ignore_errors: yes
+
+    - name: remove directories
+      command: rm -fr {{ inf_app_path }}/consul-template
+      ignore_errors: yes
+
+    - name: remove init script
+      command: rm /etc/init.d/consul-template
+      ignore_errors: yes

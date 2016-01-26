@@ -1,0 +1,15 @@
+---
+  - name: Create tomcat appserver group
+    group: name="{{ tomcat_group }}"
+
+  - name: Create tomcat user
+    user: name="{{ tomcat_user }}" comment="Tomcat dameon account" group="{{ tomcat_group }}"
+
+  - name: Create tomcat application directory
+    file: path="{{ tcat_home }}" state=directory owner="{{ tomcat_user }}" group="{{ tomcat_group }}" mode=755
+
+  - name: Create tomcat log directory
+    file: path="{{ tcat_home }}/logs" state=directory owner="{{ tomcat_user }}" group="{{ tomcat_group }}" mode=755
+
+  - name: Copy and extract tomcat
+    unarchive: src=/usr/nano/build/{{ ansible_environment }}/tomcat/tomcat-{{ tcat_version }}.tar.gz dest="{{ tcat_home }}" owner="{{ tomcat_user }}" group="{{ tomcat_group }}"

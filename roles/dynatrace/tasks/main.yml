@@ -1,0 +1,6 @@
+---
+  - include: install.yml
+    when: ans_mode == "install"
+
+  - include: uninstall.yml
+    when: ans_mode == "uninstall"

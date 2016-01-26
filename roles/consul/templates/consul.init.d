@@ -9,7 +9,7 @@
 # pidfile: /var/run/consul.pid
  
 ### BEGIN INIT INFO
-# Provides:       consul-{{ init_suffix }}
+# Provides:       consul
 # Required-Start: $local_fs $network
 # Required-Stop:
 # Should-Start:
@@ -25,12 +25,12 @@ rc_reset
 prog="consul"
 user="{{ consul_user }}"
 group="{{ consul_group }}"
-exec="{{ consul_app_path }}/bin/$prog"
+exec="{{ consul_app_path }}/$prog"
 pidfile="{{ pid_path }}/$prog.pid"
 lockfile="{{ lock_path }}/subsys/$prog"
 logfile="{{ consul_log_dir }}/$prog"
-conffile="{{ etc_conf }}/consul.conf"
-confdir="{{ etc_conf }}/consul.d"
+conffile="{{ consul_app_path }}/conf/consul.conf"
+confdir="{{ consul_config_dir }}"
  
 # pull in sysconfig settings
 [ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog

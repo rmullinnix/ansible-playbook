@@ -22,6 +22,9 @@ msp0lnans008.etdbw.com
 [webops]
 msp0lnand002.etdbw.com
 
+[webservers]
+msp0lnans001.etdbw.com
+
 [consului]
 msp0lnans001.etdbw.com
 
@@ -38,3 +41,4 @@ consulservers
 dbservers
 opsagents
 webops
+webservers

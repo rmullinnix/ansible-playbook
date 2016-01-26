@@ -1,0 +1,28 @@
+---
+# Stage Environment - normally dev, int, stg, prod
+ansible_environment: stg
+database_environment: m
+
+# installation directories infrastructure executables, associated data, and log files
+inf_app_path: /usr/nano/local
+inf_data_path: /usr/nano/data
+inf_log_path: /usr/nano/log
+
+# Common group used by infrastructure components
+inf_group: nanocore
+
+# Configuration directory and suffix for init.d file
+etc_conf: /etc
+init_suffix: ""
+
+# Runtime process management
+pid_path: /var/run
+lock_path: /var/lock
+
+# Java version to install
+jdk_rpm: jdk-7u67-linux-x64.rpm
+
+# ELK configuration
+elasticsearch_port: 9200
+logstash_port: 5075
+kibana_port: 6501

@@ -1,0 +1,3 @@
+---
+   dynatrace_user: tomcat
+   dynatrace_group: webserver

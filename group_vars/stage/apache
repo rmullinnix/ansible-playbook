@@ -1,0 +1,6 @@
+---
+# Apache configuration information
+apache_port: 8040
+apache_admin: Rob.Mullinnix@assurant.com
+apache_doc_root: "{{ inf_app_path }}/apache2/httpd"
+apache_log_level: warn

@@ -9,7 +9,7 @@
     file: path={{ item }} state=directory group={{ inf_group }} owner={{ logstash_user }}
     with_items:
       - "{{ inf_app_path }}/logstash"
-      - "{{ etc_conf }}/logstash/conf.d"
+      - "{{ inf_app_path }}/logstash/conf.d"
 
   - name: Copy and extract logstash
     unarchive: src="/usr/nano/build/{{ ansible_environment }}/logstash/logstash.tar.gz" dest="{{ inf_app_path }}/logstash" owner={{ logstash_user }} group={{ inf_group }}

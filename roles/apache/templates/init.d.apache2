@@ -67,7 +67,7 @@ ARGV="$@"
 # 
 # the path to your httpd binary, including options if necessary
 pname="apache2"
-pidfile="{{ pid_path}}/httpd.pid}"
+pidfile="{{ pid_path }}/httpd.pid}"
 homedir="{{ inf_app_path }}/$pname"
 apachectl="$homedir/bin/apachectl"
 

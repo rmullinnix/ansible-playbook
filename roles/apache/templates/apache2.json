@@ -5,7 +5,7 @@
         "port": {{ apache_port }},
         "check": {
             "script": "{{ inf_app_path }}/apache2/bin/apache_status {{ apache_port }}",
-            "interval": "300s"
+            "interval": "20s"
         }
     }
 }

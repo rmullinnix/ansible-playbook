@@ -18,6 +18,12 @@
     - role: common
     - role: consul
 
+- hosts: consului
+  become: yes
+
+  roles:
+    - role: consului
+
 # setup and deploy consul-template
 - hosts: consultemplate
   become: yes

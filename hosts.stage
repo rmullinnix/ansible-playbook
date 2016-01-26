@@ -1,6 +1,9 @@
 [consulagents]
 msp0lmngm[001:003].etdbw.com
 
+[aebbackend]
+msp0lnand002.etdbw.com
+
 [consulservers]
 msp0lnanm[001:003].etdbw.com
 
@@ -29,6 +32,9 @@ msp0lnanm001.etdbw.com host_ip=10.80.129.200
 [webservers]
 msp0lnanm002.etdbw.com
 
+[appservers]
+msp0lnanm001.etdbw.com
+
 [stage:children]
 consulagents
 consulservers
@@ -36,3 +42,4 @@ dbservers
 elasticsearch
 logstash
 webservers
+aebbackend

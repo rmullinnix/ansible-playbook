@@ -7,7 +7,7 @@
       - "{{ inf_app_path }}/consul-template"
 
   - name: Process templates init.d
-    template: src=consul-template.init.d dest=/etc/init.d/consul-template{{ init_suffix }} mode=744
+    template: src=consul-template.init.d dest=/etc/init.d/consul-template mode=744
     notify: 
       - install consultemplate
       - restart consultemplate

@@ -1,0 +1,7 @@
+{
+    "service": {
+        "name": "tomcat",
+        "tags": ["{{ tcat_cluster_name }}"],
+        "port": {{ tcat_port }}
+    }
+}

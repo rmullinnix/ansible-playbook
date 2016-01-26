@@ -1,0 +1,9 @@
+---
+# tomcat configuration information
+tcat_port: "{{ 8081 + (cluster_port_offset * 100) }}"
+tcat_redirect_port: "{{ 8444 + cluster_port_offset }}"
+tcat_shotdown_port: -1
+tcat_ajp_port: "{{ 8010 + ( cluster_port_offset * 100) }}"
+tcat_app_base: webapps
+tcat_home: "{{ inf_app_path }}/tomcat/apache_tomcat_{{ tcat_version }}"
+tcat_base: "{{ inf_app_path }}/tomcat/{{ tcat_cluster_name }}"

@@ -5,8 +5,8 @@
   - name: Create apache user
     user: name="{{ apache_user }}" comment="Apache dameon account" group="{{ apache_group }}"
 
-  - name: Copy and extract /usr/local/lib
-    unarchive: src=/usr/nano/build/{{ ansible_environment }}/common/lib/usr_local_lib.tar.gz dest=/usr/local/lib
+  - name: Copy and extract common libraries
+    unarchive: src=/usr/nano/build/{{ ansible_environment }}/common/lib/usr_local_lib.tar.gz dest={{ inf_app_path }}/lib
 
   - name: Create apache application directory / doc root
     file: path={{ item }} state=directory owner="{{ apache_user }}" group="{{ apache_group }}" mode=755
@@ -15,7 +15,7 @@
       - "{{ apache_doc_root }}"
 
   - name: Copy and extract apache2
-    unarchive: src=/usr/nano/build/{{ ansible_environment }}/apache2/apache2.tar.gz dest="{{ inf_app_path}}/apache2" owner="{{ apache_user }}" group="{{ apache_group }}"
+    unarchive: src=/usr/nano/build/{{ ansible_environment }}/apache2/apache2.tar.gz dest="{{ inf_app_path }}/apache2" owner="{{ apache_user }}" group="{{ apache_group }}"
 
   - name: Create apache httpd.conf
     template: src={{ item.src }} dest={{ item.dest }} owner="{{ apache_user }}" group="{{ apache_group }}"
@@ -25,7 +25,7 @@
     notify: restart apache
 
   - name: Create apache init.d script, consul json
-    template: src=init.d.apache2 dest=/etc/init.d/apache2{{ init_suffix }} mode=744
+    template: src=init.d.apache2 dest=/etc/init.d/apache2 mode=744
     notify:
       - install apache
       - restart apache
@@ -34,7 +34,8 @@
     copy: src="/usr/nano/build/{{ ansible_environment }}/status-utils/apache_status" dest="{{ inf_app_path }}/apache2/bin/apache_status" mode=755 owner="{{ apache_user }}" group="{{ apache_group }}"
 
   - name: Create consul json file
-    template: src=apache2.json dest={{ etc_conf }}/consul.d/apache2.json mode=644
+    template: src=apache2.json dest={{ consul_config_dir }}/apache2.json mode=644
+    notify: refresh consul
 
-  - name: Create logstash-forwarder config file
-    template: src=logstash-forwarder.conf dest={{ etc_conf }}/logstash-forwarder/conf.d/10-apache.conf mode=644
+#  - name: Create logstash-forwarder config file
+#    template: src=logstash-forwarder.conf dest={{ etc_conf }}/logstash-forwarder/conf.d/10-apache.conf mode=644

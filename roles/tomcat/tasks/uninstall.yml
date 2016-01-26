@@ -1,0 +1,25 @@
+---
+  - name: Stop tomcat service
+    service: name=tcat7 state=stopped
+    ignore_errors: yes
+
+  - name: Remove tomcat user
+    user: name="{{ tomcat_user }}" state=absent remove=true
+    ignore_errors: yes
+
+  - name: Remove tomcat application directory
+    file: path="{{ inf_app_path }}/TcatServer" state=absent
+    ignore_errors: yes
+
+  - name: Remove tomcat service
+    command: /sbin/insserv -r tcat7
+    ignore_errors: yes
+
+  - name: Remove tomcat init.d script
+    file: path=/etc/init.d/tcat7 state=absent
+    ignore_errors: yes
+
+  - name: Remove consul json file
+    file: path={{ consul_config_dir }}/tomcat.json state=absent
+    notify: refresh consul
+    ignore_errors: yes

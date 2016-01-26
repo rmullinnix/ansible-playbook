@@ -1,10 +1,10 @@
 ---
 # file: roles/consul/handlers/main.yml
 - name: install consul
-  command: /sbin/insserv -f consul{{ init_suffix }}
+  command: /sbin/insserv -f consul
 
 - name: restart consul
-  service: name=consul{{ init_suffix }} state=restarted
+  service: name=consul state=restarted
 
 - name: refresh consul
-  service: name=consul{{ init_suffix }} state=reloaded
+  service: name=consul state=reloaded

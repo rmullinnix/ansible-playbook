@@ -1,0 +1,16 @@
+---
+  - name: capture tcat version if already installed
+    shell: '{{ tcat_home }}/bin/catalina.sh version | grep "Server version" | cut -d"/" -f2'
+    register: tcat_ins_version
+    ignore_errors: yes
+
+  - debug: var=tcat_ins_version
+
+  - include: install.yml
+    when: tcat_ins_version.stdout != "{{ tcat_version }}" and ans_mode == "install"
+
+  - include: install_cluster.yml
+    when: ans_mode == "install"
+
+  - include: uninstall.yml
+    when: ans_mode == "uninstall"

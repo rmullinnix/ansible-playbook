@@ -1,0 +1,10 @@
+---
+# file: roles/tomcat/handlers/main.yml
+- name: install tomcat
+  command: /sbin/insserv -f tcat7
+
+- name: restart tomcat
+  service: name=tcat7 state=restarted
+
+- name: refersh consul
+  service: name=consul state=reloaded

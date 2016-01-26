@@ -1,0 +1,7 @@
+---
+# mongoDB configuration
+#   mongod_deploy:  single or cluster
+mms_ops_host: msp0lnand002.etdbw.com
+mms_ops_port: 8180
+mms_group_id: 560ae943e4b0089761e6225e
+mms_api_key: 2108c75dc93a7b3a272e6789c8242b81

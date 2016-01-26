@@ -1,0 +1,15 @@
+---
+  - name: Create dynatrace appserver group
+    group: name="{{ dynatrace_group }}"
+
+  - name: Create dynatrace user
+    user: name="{{ dynatrace_user }}" comment="dynatrace account" group="{{ dynatrace_group }}"
+
+  - name: Create dynatrace application directory
+    file: path="{{ dynatrace_home }}" state=directory owner="{{ dynatrace_user }}" group="{{ dynatrace_group }}" mode=755
+
+  - name: Create dynatrace log directory
+    file: path="{{ dynatrace_home }}/log" state=directory owner="{{ dynatrace_user }}" group="{{ dynatrace_group }}" mode=755
+
+  - name: Copy and extract dynatrace
+    unarchive: src=/usr/nano/build/{{ ansible_environment }}/dynatrace/dynatrace.tar.gz dest="{{ dynatrace_home }}" owner="{{ dynatrace_user }}" group="{{ dynatrace_group }}"
