@@ -39,19 +39,21 @@ else
 fi
 TCAT_ENV="`$DIRNAME $LINK`/tcat-env.conf"
 
+# 2016-01-29 put SERVICE_NAME in tcat-env.conf and not rely on script filename
+#
 # Get the service name from the name of the init script.
-SCRIPT_DIR="`$DIRNAME $0`"
-if [[ $SCRIPT_DIR =~ /etc/rc\d*..d ]]; then
+#SCRIPT_DIR="`$DIRNAME $0`"
+#if [[ $SCRIPT_DIR =~ /etc/rc\d*..d ]]; then
     # Resolve symlink paths like /etc/rc6.d/S96tcat7
-    ls=`ls -ld "$0"`
-    LINK=`expr "$ls" : '.*-> \(.*\)$'`
-    if ! expr "$LINK" : '/.*' > /dev/null; then
-        LINK=`dirname "$0"`/"$LINK"
-    fi
-    SERVICE_NAME="`$BASENAME $LINK`"
-else
-    SERVICE_NAME="`$BASENAME $0`"
-fi
+#    ls=`ls -ld "$0"`
+#    LINK=`expr "$ls" : '.*-> \(.*\)$'`
+#    if ! expr "$LINK" : '/.*' > /dev/null; then
+#        LINK=`dirname "$0"`/"$LINK"
+#    fi
+#    SERVICE_NAME="`$BASENAME $LINK`"
+#else
+#    SERVICE_NAME="`$BASENAME $0`"
+#fi
 
 # Source the app config file, if it exists (console users can modify this).
 [ -r "$TCAT_ENV" ] && . "${TCAT_ENV}"

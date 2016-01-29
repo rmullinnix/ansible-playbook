@@ -4,7 +4,7 @@
     register: tcat_ins_version
     ignore_errors: yes
 
-  - debug: var=tcat_ins_version
+  - debug: var=aebedx
 
   - include: install.yml
     when: tcat_ins_version.stdout != "{{ tcat_version }}" and ans_mode == "install"

@@ -1,11 +1,27 @@
 ---
+  - include_vars: "{{ tcat_cluster_name}}.json"
+
+  - name: download application war files from artifactory
+    command: "/usr/bin/curl http://localhost:8090/artifactoryservices/artifactory/downloadArtifact/com.assurant.inc.{{ item.groupid }}:{{ item.name }}:{{ item.version }}"
+    run_once: true
+    delegate_to: 127.0.0.1
+    with_items: "{{ cluster_app_list }}"
+
+  - name: copy war files to distribution directory
+    command: "mv /tmp/{{ item.name }}.war /usr/nano/build/{{ ansible_environment }}/tomcat/{{ item.name }}-{{ item.version }}.war"
+    run_once: true
+    delegate_to: 127.0.0.1
+    with_items: "{{ cluster_app_list }}"
+    
   - name: Create tomcat directory structure
     file: path="{{ item }}" state=directory owner="{{ tomcat_user }}" group="{{ tomcat_group }}" mode=755
     with_items:
       - "{{ tcat_base }}"
+      - "{{ tcat_base }}/AppConfXML"
       - "{{ tcat_base }}/conf"
       - "{{ tcat_base }}/conf/Catalina"
       - "{{ tcat_base }}/conf/Catalina/localhost"
+      - "{{ tcat_base }}/lib"
       - "{{ tcat_base }}/logs"
       - "{{ tcat_base }}/tcat-data"
       - "{{ tcat_base }}/temp"
@@ -30,6 +46,28 @@
       - { src: "web.xml", dest: "{{ tcat_base }}/conf/web.xml" }
       - { src: "catalina.sh", dest: "{{ tcat_base }}/conf/Catalina/localhost/catalina.sh" }
 
-  - name: Copy cluster application war files
-    copy: src="/usr/nano/build/{{ ansible_environment }}/tomcat/{{ tcat_cluster_name }}/{{ item }}" dest="{{ tcat_base }}/{{ tcat_app_base }}/{{ item }}" owner="{{ tomcat_user }}" group="{{ tomcat_group }}"
+  - name: Copy application configuration files
+    copy: src="/usr/nano/build/{{ ansible_environment }}/tomcat/AppConfXML/{{ item.name }}.xml" dest="{{ tcat_base }}/AppConfXML/{{ item.name }}.xml" owner="{{ tomcat_user }}" group="{{ tomcat_group }}"
     with_items: "{{ cluster_app_list }}"
+
+  - name: Copy tomcat instance application war files
+    copy: src="/usr/nano/build/{{ ansible_environment }}/tomcat/{{ item.name }}-{{ item.version }}.war" dest="{{ tcat_base }}/{{ tcat_app_base }}/{{ item.name }}.war" owner="{{ tomcat_user }}" group="{{ tomcat_group }}"
+    with_items: "{{ cluster_app_list }}"
+
+  - name: Add tomcat instance libraries
+    copy: src="/usr/nano/build/{{ ansible_environment }}/tomcat/{{ item }}" dest="{{ tcat_base }}/lib/{{ item }}" owner="{{ tomcat_user }}" group="{{ tomcat_group }}"
+    with_items: "{{ cluster_lib_list }}"
+
+  - name: Add JDBC Passwords for tomcat instance
+    lineinfile: dest="{{ tcat_base }}/conf/catalina.properties" regexp="^db.password.{{ item }}" insertafter="^#JDBC Passwords" line="db.password.{{ item }}"
+    with_items: "{{ cluster_jdbc_list }}"
+
+  - name: Add environment variables for tomcat instance
+    lineinfile: dest="{{ tcat_base }}/conf/catalina.properties" regexp="^{{ item }}=" insertafter="^#Adding Environment Variable" line="{{ item }}"
+    with_items: "{{ cluster_env_vars }}"
+
+  - name: Add init.d script for tomcat instance
+    file: src="{{ tcat_base }}/conf/Catalina/localhost/tcat7-linux.sh" dest=/etc/init.d/tcat-{{ tcat_cluster_name }} state=link
+
+  - name: Install tomcat instance as a service
+    command: "/sbin/insserv -f tcat-{{ tcat_cluster_name }}"

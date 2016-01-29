@@ -7,23 +7,11 @@
   become: yes
 
   vars:
-    tcat_cluster_name: aebbackend
-    cluster_app_list: { "abc.war", "def.war" }
-    cluster_port_offset: 0
+    tcat_cluster_name: "aebedx"
 
   vars_prompt:
     - name: "ans_mode"
       prompt: "install or uninstall?"
-
-  roles:
-    - role: tomcat
-
-- hosts: aebservices
-  become: yes
-
-  vars:
-    tcat_cluster_name: aebservices
-    cluster_port_offset: 1
 
   roles:
     - role: tomcat

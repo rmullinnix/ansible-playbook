@@ -1,0 +1,6 @@
+# aebedx instance configuration
+cluster_app_list: [ { name: "PartnerManagementService", version: "3.0.1", groupid: "tpm" }, { name: "PartnerManagement", version: "3.0.1", groupid: "tpm" }, { name: "WAMService", version: "1.9.1", groupid: "workflow" } ]
+cluster_port_offset: 0
+cluster_jdbc_list: [ "tradingPartnerManagementService.tpm={{ jdbc_tpm }}", "tpm.daas.OperationalDatasource={{ jdbc_daas_tpm }}", "WAMService.jbpm.datasource={{ jdbc_wam }}" ]
+cluster_env_vars: [ "server.env={{ ansible_environment }}", "db.env={{ database_environment }}", "documentum.env={{ documentum_environment }}", "isd.env={{ isd_environment }}", "thrift.env={{ ansible_environment }}", "thrift.port={{ thrift_port }}" ]
+cluster_lib_list: [ "AssurantTomcatConfiguration-1.1.1.jar", "com.ibm.mqetclient.jar", "com.ibm.mq.soap.jar", "jndi-1.2.1.jar", "com.ibm.dhbcore-61.jar", "com.ibm.mqjms-1.0.jar", "connector.jar", "jta-1.1.jar", "com.ibm.mq-1.0.jar", "com.ibm.mq.postcard.jar", "jms.jar", "ojdbc6.jar" ]

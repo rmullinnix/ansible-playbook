@@ -13,3 +13,6 @@
 
   - name: Copy and extract tomcat
     unarchive: src=/usr/nano/build/{{ ansible_environment }}/tomcat/tomcat-{{ tcat_version }}.tar.gz dest="{{ tcat_home }}" owner="{{ tomcat_user }}" group="{{ tomcat_group }}"
+
+  - name: Add Assurant tomcat configuration jar
+    copy: src=/usr/nano/build/{{ ansible_environment }}/tomcat/AssurantTomcatConfiguration-1.1.1.jar dest="{{ tcat_home }}/lib/AssurantTomcatConfiguration-1.1.1.jar" owner="{{ tomcat_user }}" group="{{ tomcat_group }}"

@@ -7,3 +7,13 @@ tcat_ajp_port: "{{ 8010 + ( cluster_port_offset * 100) }}"
 tcat_app_base: webapps
 tcat_home: "{{ inf_app_path }}/tomcat/apache_tomcat_{{ tcat_version }}"
 tcat_base: "{{ inf_app_path }}/tomcat/{{ tcat_cluster_name }}"
+
+# tomcat jdbc passwords
+jdbc_tpm: "Tctrdaeb"
+jdbc_daas_tpm: "Tctrdaeb"
+jdbc_wam: "jboss333"
+
+# tomcat environment variables
+documentum_environment: "drydoc"
+isd_environment: "INTG"
+thrift_port: 20200
